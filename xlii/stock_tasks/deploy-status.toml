@@ -1,0 +1,13 @@
+name = "deploy-status"
+description = "List the app docroots deployed on the appbox (params: conn, root)"
+
+[params.conn]
+default = "appbox"
+help = "remote connection name (xlii remote add)"
+
+[params.root]
+default = "srv/apps"
+help = "docroot base on the box, relative to the SSH login home"
+
+[[step]]
+run = "xlii ls sftp://{{conn}}/{{root}}"

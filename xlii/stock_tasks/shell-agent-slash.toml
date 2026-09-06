@@ -1,0 +1,11 @@
+name = "shell-agent-slash"
+description = "Pipe demo: shell status, agent digest, read-only slash (no writes)"
+
+[[step]]
+run = "git status -sb"
+
+[[step]]
+ask = "In one sentence: what is the working tree state?"
+
+[[step]]
+slash = "/tasks list"

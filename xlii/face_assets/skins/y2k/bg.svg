@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="y2k-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#241e18"/>
+      <stop offset="0.5" stop-color="#1a1612"/>
+      <stop offset="1" stop-color="#201a14"/>
+    </linearGradient>
+    <pattern id="y2k-brush" width="64" height="4" patternUnits="userSpaceOnUse">
+      <rect width="64" height="4" fill="none"/>
+      <path d="M0 1h64" stroke="#c4b49a" stroke-width="0.6" opacity="0.22"/>
+      <path d="M0 3h64" stroke="#000" stroke-width="0.5" opacity="0.28"/>
+    </pattern>
+  </defs>
+  <rect width="64" height="64" fill="url(#y2k-bg)"/>
+  <rect width="64" height="64" fill="url(#y2k-brush)"/>
+  <rect width="64" height="64" fill="#c47820" opacity="0.05"/>
+</svg>

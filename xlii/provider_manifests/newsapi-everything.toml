@@ -1,0 +1,40 @@
+name = "newsapi-everything"
+version = 1
+summary = "NewsAPI everything search — full-text news across 150k sources (argus: newsapi, hand-authored cohort 2)"
+category = "news"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://newsapi.org/v2/everything"
+
+[request.params]
+q = "{query}"
+pageSize = "{limit}"
+sortBy = "publishedAt"
+language = "{lang}"
+
+[defaults]
+limit = "25"
+lang = "en"
+
+[auth]
+kind = "query"
+key_env = "NEWSAPI_API_KEY"
+param = "apiKey"
+required = true
+
+[quota]
+daily = 100
+
+[shape]
+records = "articles"
+
+[shape.fields]
+title = "title"
+author = "author"
+sourceName = "source.name"
+url = "url"
+imageUrl = "urlToImage"
+publishedAt = "publishedAt"
+description = "description"

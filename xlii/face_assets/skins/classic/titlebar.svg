@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="28" viewBox="0 0 8 28">
+  <defs>
+    <linearGradient id="cl-tb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8e8e8"/>
+      <stop offset="0.14" stop-color="#b0b0b0"/>
+      <stop offset="0.5" stop-color="#6a6a6a"/>
+      <stop offset="0.86" stop-color="#3a3a3a"/>
+      <stop offset="1" stop-color="#1c1c1c"/>
+    </linearGradient>
+  </defs>
+  <rect width="8" height="28" fill="url(#cl-tb)"/>
+  <rect width="8" height="1" fill="#ffffff"/>
+  <rect y="27" width="8" height="1" fill="#000000"/>
+</svg>

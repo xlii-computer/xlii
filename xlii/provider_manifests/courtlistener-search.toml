@@ -1,0 +1,38 @@
+name = "courtlistener-search"
+version = 1
+summary = "CourtListener — US case law, dockets, opinions (argus: courtlistener, hand-authored cohort 2)"
+category = "compliance"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://www.courtlistener.com/api/rest/v4/search/"
+
+[request.params]
+q = "{query}"
+page_size = "{limit}"
+
+[defaults]
+limit = "20"
+
+[auth]
+kind = "header"
+key_env = "COURTLISTENER_API_KEY"
+header = "Authorization"
+prefix = "Token "
+required = true
+
+[quota]
+daily = 5000
+
+[shape]
+records = "results"
+
+[shape.fields]
+name = "caseName"
+court = "court"
+dateFiled = "dateFiled"
+citations = "citation"
+citeCount = "citeCount"
+snippet = "snippet"
+url = "absolute_url"

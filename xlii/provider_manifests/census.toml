@@ -1,0 +1,25 @@
+name = "census"
+version = 1
+summary = "US Census Bureau — population, demographics, income, housing by geography (argus: census.query)"
+category = "finance"
+required_params = ["ds", "varList", "yr"]
+
+[request]
+method = "GET"
+url = "https://api.census.gov/data/{yr}/acs/{ds}"
+
+[request.params]
+get = "{varList}"
+
+[auth]
+kind = "query"
+key_env = "CENSUS_API_KEY"
+param = "key"
+required = false
+
+[quota]
+daily = 500
+
+[shape]
+records = ""
+

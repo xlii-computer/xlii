@@ -1,0 +1,27 @@
+name = "openfigi"
+version = 1
+summary = "Map ticker symbols, ISINs, CUSIPs to FIGI identifiers across exchanges (argus: openfigi.query)"
+category = "finance"
+required_params = ["query"]
+
+[request]
+method = "POST"
+url = "https://api.openfigi.com/v3/search"
+
+[request.body]
+query = "{query}"
+exchCode = "{exchange}"
+
+[shape]
+records = "data"
+
+[shape.fields]
+name = "name"
+figi = "figi"
+symbol = "ticker"
+type = "securityType"
+exchange = "exchCode"
+marketSector = "marketSector"
+compositeFigi = "compositeFIGI"
+shareClassFigi = "shareClassFIGI"
+sourceUrl = "figi"

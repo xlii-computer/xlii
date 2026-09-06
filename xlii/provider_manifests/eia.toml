@@ -1,0 +1,37 @@
+name = "eia"
+version = 1
+summary = "Energy Information Administration — petroleum prices, electricity, natural gas, renewables, coal data (argus: eia.query)"
+category = "finance"
+required_params = ["freq",  "route"]
+
+[defaults]
+limit = "25"
+
+[request]
+method = "GET"
+url = "https://api.eia.gov/v2/{route}"
+
+[request.params]
+frequency = "{freq}"
+"data[]" = "value"
+"sort[0][column]" = "period"
+"sort[0][direction]" = "desc"
+length = "{limit}"
+
+[auth]
+kind = "query"
+key_env = "EIA_API_KEY"
+param = "api_key"
+required = true
+
+[quota]
+daily = 5000
+
+[shape]
+records = "response.data"
+
+[shape.fields]
+period = "period"
+value = "value"
+product = "product"
+units = "units"

@@ -1,0 +1,29 @@
+name = "mapbox"
+version = 1
+summary = "Routing, directions, and navigation between coordinates (argus: mapbox.query)"
+category = "satellite"
+required_params = ["coordStr", "profile"]
+
+[request]
+method = "GET"
+url = "https://api.mapbox.com/directions/v5/{profile}/{coordStr}"
+
+[request.params]
+geometries = "geojson"
+overview = "full"
+steps = "false"
+
+[auth]
+kind = "query"
+key_env = "MAPBOX_API_KEY"
+param = "access_token"
+required = true
+
+[shape]
+records = "routes"
+
+[shape.fields]
+distance = "distance"
+duration = "duration"
+geometry = "geometry"
+legs = "legs"

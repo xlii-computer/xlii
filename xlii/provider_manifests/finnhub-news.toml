@@ -1,0 +1,37 @@
+name = "finnhub-news"
+version = 1
+summary = "Real-time quotes, company profiles, earnings, news — 60 calls/min free (argus: finnhub.news)"
+category = "finance"
+required_params = ["query", "today", "weekAgo"]
+
+[request]
+method = "GET"
+url = "https://finnhub.io/api/v1/company-news"
+
+[request.params]
+symbol = "{query}"
+from = "{weekAgo}"
+to = "{today}"
+
+[auth]
+kind = "query"
+key_env = "FINNHUB_API_KEY"
+param = "token"
+required = true
+
+[quota]
+daily = 5000
+
+[shape]
+records = ""
+
+[shape.fields]
+name = "headline"
+title = "headline"
+source = "source"
+date = "datetime"
+summary = "summary"
+url = "url"
+image = "image"
+category = "category"
+sourceUrl = "url"

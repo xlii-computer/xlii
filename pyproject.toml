@@ -1,0 +1,419 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xlii"
+dynamic = ["version"]  # single source: xlii/__init__.py __version__ — stamped by scripts/stamp_version.py (date + green-test count; a red suite refuses to stamp)
+description = "Personal AI substrate — Grok + xAI Collections, user-curated personas/docs/plugins, multi-key swarm. The Emacs of AI tooling (xlii = 42)."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+  {name = "xlii", email = "hello@xlii.computer"},
+]
+keywords = ["ai", "agent", "xai", "grok", "cli"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.11"
+dependencies = [
+  "xai-sdk>=1.11",
+  "openai>=1.50",
+  "httpx>=0.28",  # direct: bootstrap/xai_mgmt/stt; openai now pins httpx2, not httpx
+  "loguru>=0.7",
+  "pathspec>=0.12",
+  "prompt_toolkit>=3",
+  "rich>=13",
+  "cryptography>=41",
+  "keyring>=24",
+  "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+mcp = [
+  "mcp>=1.0",   # FastMCP server for the Grok Build bridge (xlii mcp deep-contexts)
+]
+daemon = [
+  # XMPP/OMEMO multi-machine fabric (xlii daemon). Live-verified 2026-07-15
+  # against slixmpp 1.17 / slixmpp-omemo 2.2 (xmpp-next Part A). The code
+  # targets the modern APIs: no XMLStream.process(), and encrypt_message's
+  # single-stanza return — hence the >=2 floor on slixmpp-omemo.
+  "slixmpp>=1.9",
+  "slixmpp-omemo>=2",
+  "qrcode>=7",  # optional pretty QR for `xlii pair`; ceremony works without it
+]
+tui = [
+  "textual>=0.60",       # optional full-screen front-end: xlii code --tui (tui-layer T6)
+  "textual-image>=0.7",  # true sixel/kitty/iterm image preview in the TUI transcript
+]
+web = [
+  # `xlii serve` — the Textual TUI in a browser tab (proposals/serve-web.md W1).
+  # Depends on the [tui] pins directly so `pip install "xlii[web]"` alone is
+  # honest: serving without the TUI installed is meaningless.
+  "textual-serve>=1.1",
+  "textual>=0.60",
+  "textual-image>=0.7",
+]
+files = [
+  # Optional file handling for the upload locker (/upload, /locker).
+  "pypdf>=4",          # PDF → text extraction (proposals/upload-locker.md U3)
+  "tkinterdnd2>=0.4",  # real drag-and-drop in the /upload popup (the picker works without it)
+]
+remote = [
+  # SFTP branch of the ftp:// remote-filesystem provider (proposals/remote-fs.md).
+  # FTP/FTPS need nothing extra — they ride the stdlib ftplib.
+  "paramiko>=3",
+]
+pdf = [
+  # document-pdf: markdown→HTML→PDF (weasyprint best; fpdf2 pure-python fallback).
+  "markdown>=3.5",
+  "weasyprint>=62",
+  "fpdf2>=2.7",
+]
+webdav = [
+  # WebDAV branch of the dav:// remote-filesystem provider
+  # (proposals/remote-backends.md, Vector W). A thin client over requests —
+  # PROPFIND/GET/PUT/DELETE/MKCOL — no dedicated webdav library needed.
+  "requests>=2.31",
+]
+smb = [
+  # SMB/CIFS branch of the smb:// remote-filesystem provider
+  # (proposals/remote-backends.md, Vector M) — NAS / Windows shares.
+  "smbprotocol>=1.10",
+]
+dev = [
+  "pytest>=8",
+  "pytest-cov>=5",
+  "pytest-timeout>=2.3",
+  "ruff>=0.4",
+  "pyftpdlib>=1.5",  # local throwaway FTP server for tests/test_remotefs.py (no network)
+  "import-linter>=2",  # faces->kernel import contract (godzilla-mothra V0a); CI runs lint-imports
+  # ~35 test modules importorskip("textual") and several import it at module
+  # scope, so without the [tui] pins the whole TUI/panes/dock suite either skips
+  # or fails to collect — silently, which is worse. Self-referencing the extra
+  # keeps the pins in one place; textual itself pulls platformdirs and
+  # markdown-it-py[linkify], and textual-image pulls pillow.
+  # NOT added: [daemon] and [web]. tests/test_cli.py and tests/test_serve_web.py
+  # assert the *friendly hint* shown when those extras are absent, so installing
+  # them here would turn four passing tests into skips. They belong in a
+  # full-extras CI leg, not in dev.
+  "xlii[tui]",
+]
+
+[project.scripts]
+xlii = "xlii.cli:main"
+
+[project.urls]
+Homepage = "https://xlii.computer"
+Repository = "https://github.com/xlii-computer/xlii"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["xlii*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "xlii.__version__"}
+
+[tool.setuptools.package-data]
+"xlii.stock_plugins" = ["*.md"]
+"xlii.tui" = ["*.nfo"]  # bundled default splash screen (xlii/tui/splash.nfo)
+"xlii" = ["prompts/*.md", "help/**/*.yaml", "help/**/*.md", "selfwiki/**/*.md", "stock_roles/*.md", "stock_skills/**/*.md", "stock_personas/*.md", "face_assets/*.html", "face_assets/**/*.css", "face_assets/**/*.js", "face_assets/**/*.png", "face_assets/**/*.svg", "face_assets/**/*.toml", "face_assets/**/*.jpg", "face_assets/**/*.jpeg", "face_assets/**/*.webp", "face_assets/**/*.gif", "face_assets/**/*.woff2", "face_assets/**/*.webm", "face_assets/**/*.webmanifest", "provider_manifests/*.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+timeout = 30
+filterwarnings = [
+  "ignore::DeprecationWarning:pathspec.*",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+# Start with the high-signal bug classes (syntax errors, undefined names,
+# unused imports, redefinitions). Style rules can ratchet up later.
+select = ["E9", "F"]
+
+# ---------------------------------------------------------------------------
+# Import contract (godzilla-mothra V0a): faces import kernel, NEVER the
+# reverse. Faces = xlii.tui, xlii.panes, xlii.tui_textual; kernel = every
+# other xlii module. The 22 remaining ignore_imports edges are the FROZEN
+# Stage-0 baseline (exact, never wildcarded): no new entries ever; Stage 1
+# burns the list down. The ONE edge beyond that baseline is the B1 face-deck
+# seam (xlii.face_panes -> xlii.panes.dock): the browser face drives the SAME
+# headless Dock the TUI projects rather than reimplementing the layout, and the
+# whole seam is that one exact import — narrowed on purpose so Stage 1 can
+# retire it by relocating the headless dock out of the face package.
+# unmatched_ignore_imports_alerting=error keeps the baseline
+# honest in both directions (a fixed edge must be deleted here in the same
+# PR). scripts/check_contracts.py verifies source_modules stays in sync with
+# the filesystem (including PEP 420 namespace-dir escapes grimp cannot see),
+# so a NEW kernel module cannot dodge the contract.
+# ---------------------------------------------------------------------------
+[tool.importlinter]
+root_packages = ["xlii"]
+
+[[tool.importlinter.contracts]]
+name = "faces import kernel, never the reverse"
+type = "forbidden"
+forbidden_modules = ["xlii.tui", "xlii.panes", "xlii.tui_textual"]
+unmatched_ignore_imports_alerting = "error"
+source_modules = [
+  "xlii.__main__",
+  "xlii.about",
+  "xlii.acp_client",
+  "xlii.active_session",
+  "xlii.addressing",
+  "xlii.address_book",
+  "xlii.agent",
+  "xlii.agent_browser",
+  "xlii.agent_dispatch",
+  "xlii.agent_render",
+  "xlii.agent_stats",
+  "xlii.anthropic_native",
+  "xlii.artifact_preview",
+  "xlii.artifacts",
+  "xlii.atomicio",
+  "xlii.attach",
+  "xlii.bearings",
+  "xlii.bind_form",
+  "xlii.bind_posture",
+  "xlii.binds",
+  "xlii.bootstrap",
+  "xlii.browse_popup",
+  "xlii.chat_backend",
+  "xlii.chat_router",
+  "xlii.chat_tiers",
+  "xlii.checkpoints",
+  "xlii.ci_judge",
+  "xlii.cli",
+  "xlii.client",
+  "xlii.cmds",
+  "xlii.commands",
+  "xlii.commands_help",
+  "xlii.config",
+  "xlii.console_catalog",
+  "xlii.console_prompt",
+  "xlii.context",
+  "xlii.context_budget",
+  "xlii.context_compact",
+  "xlii.conversation",
+  "xlii.cost",
+  "xlii.curation",
+  "xlii.daemon",
+  "xlii.daemon_avatar",
+  "xlii.daemon_gate",
+  "xlii.daemon_kill",
+  "xlii.daemon_toml",
+  "xlii.debug_mode",
+  "xlii.deep_search",
+  "xlii.desk",
+  "xlii.desk_files",
+  "xlii.destroy",
+  "xlii.doc",
+  "xlii.docgen",
+  "xlii.doctor",
+  "xlii.door_tools",
+  "xlii.editor",
+  "xlii.email",
+  "xlii.episode",
+  "xlii.exit_sequence",
+  "xlii.fabric",
+  "xlii.fabric_projects",
+  "xlii.face_panes",
+  "xlii.face_instance",
+  "xlii.face_receipt",
+  "xlii.face_remote",
+  "xlii.farm",
+  "xlii.farm_market",
+  "xlii.farm_muc",
+  "xlii.farm_post",
+  "xlii.farm_schedule",
+  "xlii.farm_view",
+  "xlii.farm_xmpp",
+  "xlii.fleet_status",
+  "xlii.frontmatter",
+  "xlii.fuzzy",
+  "xlii.jam",
+  "xlii.gig_form",
+  "xlii.git_status",
+  "xlii.glass",
+  "xlii.harness",
+  "xlii.help_corpus",
+  "xlii.hints",
+  "xlii.home_catalog",
+  "xlii.hooks",
+  "xlii.human_gate",
+  "xlii.ignore",
+  "xlii.imagine_run",
+  "xlii.inbox",
+  "xlii.install_form",
+  "xlii.interactive",
+  "xlii.jid_form",
+  "xlii.jid_house",
+  "xlii.job_board",
+  "xlii.job_run",
+  "xlii.jobs",
+  "xlii.journal",
+  "xlii.journal_daemon",
+  "xlii.legacy_migrate",
+  "xlii.loadout_paths",
+  "xlii.loop",
+  "xlii.loop_bundle",
+  "xlii.loop_collusion",
+  "xlii.loop_judge",
+  "xlii.loop_verdict",
+  "xlii.manifest",
+  "xlii.mcp",
+  "xlii.mcp_client",
+  "xlii.mcp_deep_context",
+  "xlii.media_client",
+  "xlii.media_in",
+  "xlii.media_out",
+  "xlii.minted",
+  "xlii.mode_contract",
+  "xlii.mode_controller",
+  "xlii.model_profiles",
+  "xlii.multimodal",
+  "xlii.omemo_payload",
+  "xlii.occ_bus",
+  "xlii.occupancy",
+  "xlii.occupancy_store",
+  "xlii.outbox",
+  "xlii.panic_mail",
+  "xlii.pairing_gate",
+  "xlii.paste_collapse",
+  "xlii.pdf_render",
+  "xlii.pdf_run",
+  "xlii.pdf_sources",
+  "xlii.pdf_text",
+  "xlii.persona",
+  "xlii.plan_ops",
+  "xlii.plugin",
+  "xlii.plugin_call",
+  "xlii.plugin_form",
+  "xlii.plugin_make_form",
+  "xlii.plugin_manifest",
+  "xlii.plugin_scaffold",
+  "xlii.plugin_transforms",
+  "xlii.pool",
+  "xlii.pr_watch",
+  "xlii.profile",
+  "xlii.providers",
+  "xlii.project_fingerprint",
+  "xlii.project_paths",
+  "xlii.project_resolver",
+  "xlii.project_rules",
+  "xlii.rail",
+  "xlii.recent_desks",
+  "xlii.refs",
+  "xlii.registry",
+  "xlii.remote_form",
+  "xlii.remote_handlers",
+  "xlii.remotefs",
+  "xlii.repl",
+  "xlii.repl_cmds",
+  "xlii.repl_history_util",
+  "xlii.repl_state",
+  "xlii.repo_map",
+  "xlii.role",
+  "xlii.scratch",
+  "xlii.secondary_ai",
+  "xlii.selfwiki",
+  "xlii.serve_face",
+  "xlii.serve_gate",
+  "xlii.serve_public",
+  "xlii.serve_spool",
+  "xlii.server_tools",
+  "xlii.session_boot",
+  "xlii.session_meter",
+  "xlii.session_state",
+  "xlii.shell_run",
+  "xlii.shell_suggest",
+  "xlii.shell_toolkit",
+  "xlii.shellgate",
+  "xlii.skills",
+  "xlii.skin_packs",
+  "xlii.status",
+  "xlii.stock_plugins",
+  "xlii.storage",
+  "xlii.storage_backend",
+  "xlii.stt",
+  "xlii.swarm",
+  "xlii.sweep",
+  "xlii.sync",
+  "xlii.system_profile",
+  "xlii.tailnet",
+  "xlii.task_form",
+  "xlii.task_shapes",
+  "xlii.tasks",
+  "xlii.terminal_image",
+  "xlii.text_hygiene",
+  "xlii.theme",
+  "xlii.tool_context",
+  "xlii.tool_gating",
+  "xlii.tool_handlers",
+  "xlii.tool_schemas",
+  "xlii.tools",
+  "xlii.totp",
+  "xlii.tracelog",
+  "xlii.transcript",
+  "xlii.turn_events",
+  "xlii.turn_prompt",
+  "xlii.turn_receipt",
+  "xlii.turn_store",
+  "xlii.turn_text",
+  "xlii.url_safe",
+  "xlii.ui",
+  "xlii.upload_popup",
+  "xlii.vault",
+  "xlii.webcode_mail",
+  "xlii.wiki",
+  "xlii.wiki_author",
+  "xlii.wiki_retrieval",
+  "xlii.window_shot",
+  "xlii.workbench",
+  "xlii.worker_agent",
+  "xlii.ws_protocol",
+  "xlii.ws_server",
+  "xlii.xai_mgmt",
+  "xlii.xmpp_send",
+  "xlii.xtool_catalog",
+]
+ignore_imports = [
+  "xlii.cmds.sessions.chat -> xlii.tui_textual",
+  "xlii.cmds.sessions.code -> xlii.tui.input_chrome",
+  "xlii.cmds.sessions.code -> xlii.tui_textual",
+  "xlii.face_panes.deck -> xlii.panes.dock",
+  "xlii.harness.session -> xlii.tui.preview",
+  "xlii.repl -> xlii.tui.input_chrome",
+  "xlii.repl_cmds.code -> xlii.tui_textual",
+  "xlii.repl_cmds.config_panel -> xlii.tui.panels",
+  "xlii.repl_cmds.edithere -> xlii.tui.panels",
+  "xlii.repl_cmds.edithere -> xlii.tui.preview",
+  "xlii.repl_cmds.file_tab -> xlii.tui.panels",
+  "xlii.repl_cmds.history -> xlii.tui.panels",
+  "xlii.repl_cmds.howto -> xlii.tui.panels",
+  "xlii.repl_cmds.image -> xlii.tui.panels",
+  "xlii.repl_cmds.knowledge -> xlii.tui.panels",
+  "xlii.repl_cmds.knowledge -> xlii.tui.plugins_panel",
+  "xlii.repl_cmds.nfo -> xlii.tui.splash",
+  "xlii.repl_cmds.remote -> xlii.tui.panels",
+  "xlii.repl_cmds.remote -> xlii.tui.remote_wizard",
+  "xlii.repl_cmds.replay -> xlii.tui.preview",
+  "xlii.repl_cmds.theme -> xlii.tui.panels",
+  "xlii.terminal_image -> xlii.tui.transcript",
+  "xlii.ui -> xlii.tui",
+  "xlii.ui -> xlii.tui.panels",
+  "xlii.ui -> xlii.tui.renderer",
+]

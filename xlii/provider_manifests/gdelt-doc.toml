@@ -1,0 +1,30 @@
+name = "gdelt-doc"
+version = 1
+summary = "GDELT DOC 2.0 — global news search, artlist mode (argus: gdelt, hand-authored cohort 2)"
+category = "news"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://api.gdeltproject.org/api/v2/doc/doc"
+
+[request.params]
+query = "{query}"
+mode = "artlist"
+maxrecords = "{limit}"
+format = "json"
+
+[defaults]
+limit = "50"
+
+[shape]
+records = "articles"
+
+[shape.fields]
+title = "title"
+url = "url"
+sourceName = "domain"
+sourceCountry = "sourcecountry"
+language = "language"
+publishedAt = "seendate"
+imageUrl = "socialimage"

@@ -1,0 +1,8 @@
+name = "diff-summary"
+description = "git diff --stat, then ask for a one-line summary"
+
+[[step]]
+run = "git diff --stat"
+
+[[step]]
+ask = "Summarize the diff stat in one sentence."

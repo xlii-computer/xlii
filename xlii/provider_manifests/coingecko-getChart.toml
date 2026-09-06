@@ -1,0 +1,19 @@
+name = "coingecko-getChart"
+version = 1
+summary = "Cryptocurrency prices, market data, OHLCV charts — 13,000+ coins (argus: coingecko.getChart)"
+category = "finance"
+required_params = ["d", "id"]
+
+[request]
+method = "GET"
+url = "https://api.coingecko.com/api/v3/coins/{id}/ohlc"
+
+[request.params]
+vs_currency = "usd"
+days = "{d}"
+
+[quota]
+daily = 500
+
+[shape]
+records = ""

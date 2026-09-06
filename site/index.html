@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XLII — a personal AI substrate for the terminal</title>
+<meta name="description" content="xlii places a language-model agent at the shell level of a personal machine. Local files first. Remote services second. The model is never the security boundary.">
+<meta property="og:title" content="XLII — a personal AI substrate for the terminal">
+<meta property="og:url" content="https://xlii.computer/">
+<meta property="og:description" content="Local files first. Remote services second. The model is never the security boundary.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="/">XLII</a>
+    <ul>
+      <li><a href="#principles">Principles</a></li>
+      <li><a href="#safety">Safety</a></li>
+      <li><a href="#surfaces">Surfaces</a></li>
+      <li><a href="https://github.com/xlii-computer/xlii" data-repo-path="blob/main/docs/DESIGN.md">Design</a></li>
+      <li><a href="https://github.com/xlii-computer/xlii" data-repo-path="">GitHub</a></li>
+    </ul>
+  </nav>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>A personal AI substrate for the terminal.</h1>
+    <p class="lead">
+      Most AI tools are a chatbot pretending to be a developer. xlii inverts
+      that: it puts a language-model agent at the shell level of your own machine,
+      under constraints most AI tooling does not adopt: your files are the
+      source of truth, everything you curate is plain text you own, and the
+      model is never trusted as a security boundary.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/xlii-computer/xlii" data-repo-path="blob/main/docs/GOLDEN-PATH.md">The first hour</a>
+      <a class="btn" href="https://github.com/xlii-computer/xlii" data-repo-path="blob/main/docs/DESIGN.md">Read the design</a>
+      <span class="install"><span class="prompt">$</span>pip install xlii</span>
+    </div>
+
+    <div class="term" aria-label="Example session">
+      <div class="bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">xlii code · ~/proj</span>
+      </div>
+<pre><span class="status">mode: —  ·  trust: guarded  ·  surface: code</span>
+<span class="p">[$]</span> <span class="sh">git status --short</span>
+<span class="out"> M xlii/shellgate.py</span>
+<span class="p">[$]</span> <span class="ask">? what does the change to shellgate do</span>
+<span class="out">Adds container runtimes to SYSTEM_BINARIES so `docker run` classifies
+as modifies-system instead of read-only. One test added. No behavior
+change for known binaries.</span>
+<span class="p">[$]</span> <span class="cmd">/plan</span> <span class="sh">make unknown binaries fail closed</span>
+<span class="status">mode: plan  ·  trust: guarded  ·  surface: code</span>
+<span class="out">1. Add READ_ONLY_BINARIES allowlist
+2. Default unknown → modifies-project in _classify_segment
+3. Add xfail rows for docker / socat / nested $()
+   → /execute to proceed, /cancel to drop</span>
+<span class="p">[$]</span> <span class="cmd">/execute</span>
+<span class="out">edit_file xlii/shellgate.py  ·  write_file tests/test_shellgate_fail_closed.py</span>
+<span class="gate">bash  intent=network   pytest -q && git push
+      classified: network — run it? [y/N]</span></pre>
+    </div>
+  </div>
+</section>
+
+<section id="principles">
+  <div class="wrap">
+    <h2>Three ideas carry the design.</h2>
+    <p class="lead">Everything else follows from them.</p>
+    <div class="grid three">
+      <div class="card">
+        <span class="k">Local truth</span>
+        <h3>Files on disk are authoritative.</h3>
+        <p>Hosted retrieval, indexes, and mirrors are derived and disposable.
+        Remote custody is a per-project dial that includes zero: a project
+        initialized with <code>--local</code>, and every home session, never
+        leaves the machine.</p>
+      </div>
+      <div class="card">
+        <span class="k">You compose it</span>
+        <h3>Curation is the durable asset.</h3>
+        <p>Personas, reference docs, API plugins, roles, skills, memory pages:
+        all Markdown you can read, edit, version, and move. Models are
+        interchangeable components behind a stable interface. The vendor
+        provides primitives; you compose the system.</p>
+      </div>
+      <div class="card">
+        <span class="k code">Not a boundary</span>
+        <h3>The model is never the security boundary.</h3>
+        <p>What the agent says it intends is advisory. Whether a command runs,
+        whether a path may be written, whether a worker may escalate, is
+        decided by code that classifies independently and fails closed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="grid two isnt">
+      <div>
+        <h2>What it is</h2>
+        <ul>
+          <li><b>A shell-first REPL.</b> A bare line is a shell command with a real TTY. <code>?text</code> addresses the agent. <code>/cmd</code> is a slash command.</li>
+          <li><b>Three session kinds.</b> Home (the machine, never synced), project (a folder you chose), chat (a persona with its own memory).</li>
+          <li><b>One kernel, many clients.</b> Terminal UI, browser, desktop window, and a multi-instance control plane are views over the same session.</li>
+          <li><b>A verification culture.</b> Cold-context checks, blind peer review, cross-vendor second opinions, and an autonomous loop whose judges can lock tests.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>What it is not</h2>
+        <ul>
+          <li><b>Not an IDE.</b> Bring your own editor. Inline diffs and visual context are out of scope.</li>
+          <li><b>Not a hosted chatbot.</b> There is no vendor-side memory and no account beyond your model provider's key.</li>
+          <li><b>Not a cloud agent host.</b> Where cloud agents help, xlii delegates to them through adapters rather than re-hosting them.</li>
+          <li><b>Not for everyone.</b> It rewards investment. Casual users may bounce; that trade is deliberate.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Four kinds of work, four tool palettes.</h2>
+    <p class="lead">Not personalities layered on one agent — different tool sets, enforced in code.</p>
+    <div class="grid four">
+      <div class="card">
+        <span class="k">Coordinate</span>
+        <h3>Orchestrator</h3>
+        <p>The agent you talk to. Full palette, including the ability to dispatch parallel workers.</p>
+      </div>
+      <div class="card">
+        <span class="k">Operate</span>
+        <h3>Ops posture</h3>
+        <p>Read tools plus shell for machine diagnostics. The shell gate is the brake.</p>
+      </div>
+      <div class="card">
+        <span class="k">Build</span>
+        <h3>Code and rail</h3>
+        <p>Writes unlocked; plan domain locked. The rail holds writes shut through four design stages.</p>
+      </div>
+      <div class="card">
+        <span class="k">Verify</span>
+        <h3>Judges and reviewers</h3>
+        <p>Read-only, often on a different model or vendor than the builder. Starved verifiers return inconclusive, never fail.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="wrap">
+    <h2>Safety lives in code.</h2>
+    <p class="lead">Every shell command is classified independently of what the model declared, and the stronger classification wins.</p>
+    <div class="ladder">
+      <div class="l0"><span class="t">read-only</span><span class="s">ls, grep, git status, pytest</span></div>
+      <div class="l1"><span class="t">modifies-project</span><span class="s">writes inside the tree, interpreters, build tools</span></div>
+      <div class="l2"><span class="t">network</span><span class="s">curl, ssh, package installs, git push — prompts unless trusted</span></div>
+      <div class="l3"><span class="t">modifies-system</span><span class="s">sudo, services, mounts, signals — always prompts, no tier waives it</span></div>
+    </div>
+    <ul class="bullets">
+      <li><b>Workers are read-only by architecture.</b> No write tools, no dispatch, no client pool, and a shell ceiling enforced by the classifier rather than by instruction.</li>
+      <li><b>Path containment.</b> File tools resolve inside the project root after following symlinks. Write domains are derived from the active mode every turn and never stored.</li>
+      <li><b>Human-only operations.</b> Destruction and administration need a real foreground console and a fresh secret. No request flag is accepted as proof of a human.</li>
+      <li><b>Fail closed.</b> Unknown mode, unknown trust tier, unparseable input, or no human to ask: the answer is refuse or escalate, never permit.</li>
+      <li><b>Inbound channels are RCE surfaces.</b> A paired phone, a webhook, a browser tab: each is gated by identity, trust, and an explicit open window — not by the transport being encrypted.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="surfaces">
+  <div class="wrap">
+    <h2>One session. Several ways in.</h2>
+    <p class="lead">Every client is a projection of the same kernel. The kernel never imports a client — that rule is enforced in CI.</p>
+    <div class="surf">
+      <div><span class="n">xlii code</span><span class="d">The inline REPL. Shell-primary, full TTY.</span></div>
+      <div><span class="n">--tui</span><span class="d">Full-screen terminal UI with panes, dock, and image preview.</span></div>
+      <div><span class="n">xlii serve</span><span class="d">The TUI in a browser tab. Loopback or tailnet; a public mode sits behind a pairing code and your reverse proxy.</span></div>
+      <div><span class="n">--tauri</span><span class="d">A desktop window over the same session, with lock overlay and theme packs.</span></div>
+      <div><span class="n">xlii daemon</span><span class="d">Multi-instance control plane: star topology, one controller, capped keys on nodes, bound trust-on-first-use pairing.</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Where it stands.</h2>
+    <div class="honest">
+      <p><b>Alpha.</b> The architecture is settled; surfaces and details still move. It runs end-to-end against a real xAI account and is xAI-first today, with external providers supported for worker agents.</p>
+      <p><b>About 142k lines of Python</b> across 519 modules, with a hermetic suite of roughly 5,400 tests that passes in three minutes without network access or API keys. Import contracts, generated documentation, and security scanning gate every push.</p>
+      <p><b>Known limitations are documented</b>, including the current gaps in the shell classifier and the fact that content the agent reads is gated by consequence, not filtered on the way in. See the design document rather than discovering them.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap row">
+    <span>XLII · MIT License · <a href="mailto:hello@xlii.computer">hello@xlii.computer</a></span>
+    <ul>
+      <li><a href="https://github.com/xlii-computer/xlii" data-repo-path="blob/main/docs/DESIGN.md">Design</a></li>
+      <li><a href="https://github.com/xlii-computer/xlii" data-repo-path="blob/main/docs/GOLDEN-PATH.md">First hour</a></li>
+      <li><a href="https://github.com/xlii-computer/xlii" data-repo-path="blob/main/docs/HOWTO.md">Walkthrough</a></li>
+      <li><a href="https://github.com/xlii-computer/xlii" data-repo-path="blob/main/SECURITY.md">Security</a></li>
+      <li><a href="https://github.com/xlii-computer/xlii" data-repo-path="">Source</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  // Set once after the repository transfer; every docs/source link follows.
+  var REPO = "https://github.com/xlii-computer/xlii";
+  document.querySelectorAll("a[data-repo-path]").forEach(function (a) {
+    var p = a.getAttribute("data-repo-path");
+    a.href = p ? REPO.replace(/\/$/, "") + "/" + p : REPO;
+  });
+</script>
+</body>
+</html>

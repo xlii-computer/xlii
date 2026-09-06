@@ -1,0 +1,40 @@
+name = "openfec-donors"
+version = 1
+summary = "Campaign contributions, PAC receipts, candidate financials, donor lookup (argus: openfec.donors)"
+category = "compliance"
+required_params = [ "query"]
+
+[defaults]
+limit = "25"
+
+[request]
+method = "GET"
+url = "https://api.open.fec.gov/v1/schedules/schedule_a/"
+
+[request.params]
+contributor_name = "{query}"
+per_page = "{limit}"
+sort = "-contribution_receipt_date"
+
+[auth]
+kind = "query"
+key_env = "OPENFEC_API_KEY"
+param = "api_key"
+required = true
+
+[quota]
+daily = 1000
+
+[shape]
+records = "results"
+
+[shape.fields]
+name = "contributor_name"
+amount = "contribution_receipt_amount"
+amountRaw = "contribution_receipt_amount"
+date = "contribution_receipt_date"
+recipient = "committee.name"
+employer = "contributor_employer"
+occupation = "contributor_occupation"
+city = "contributor_city"
+state = "contributor_state"

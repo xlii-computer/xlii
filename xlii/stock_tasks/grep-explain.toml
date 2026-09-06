@@ -1,0 +1,16 @@
+name = "grep-explain"
+description = "Search the tree for a term, then explain the matches (params: query required, scope)"
+
+[params.query]
+required = true
+help = "text to search for"
+
+[params.scope]
+default = "."
+help = "path or glob to search under"
+
+[[step]]
+run = "grep -rn -- {{query}} {{scope}} | head -60"
+
+[[step]]
+ask = """Explain what the matches above are doing and where {{query}} is used. If there are no matches, say so plainly."""

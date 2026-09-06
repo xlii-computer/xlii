@@ -1,0 +1,22 @@
+name = "blockstream-tx"
+version = 1
+summary = "Bitcoin transaction lookup by txid — fee, size, confirmation status (argus: blockstream.tx)"
+category = "finance"
+required_params = ["txid"]
+
+[request]
+method = "GET"
+url = "https://blockstream.info/api/tx/{txid}"
+
+[quota]
+daily = 300
+
+[shape]
+records = ""
+
+[shape.fields]
+txid = "txid"
+fee = "fee"
+size = "size"
+confirmed = "status.confirmed"
+blockHeight = "status.block_height"

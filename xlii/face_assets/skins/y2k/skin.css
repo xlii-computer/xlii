@@ -1,0 +1,121 @@
+/* Y2K — Winamp-mapped bitmap chrome.
+   Selectors live under html[data-skin="pack:y2k"] only. Image urls are
+   absolute /skins/y2k/… so sandboxed form iframes can resolve them.
+
+   main.bmp            → --texture-bg            (tiled metal)
+   titlebar.bmp        → --chrome-menubar-img    (repeat-x) + --slice-menubar
+   cbuttons.bmp        → --chrome-btn-img        (+ hover / down)
+   pledit.bmp          → --chrome-pane-img       + --slice-pane
+   pledit title        → --chrome-slot-img
+   LCD / display       → --texture-transcript    + --chrome-input-img
+   bottom of main      → --chrome-inputbar-img
+   min/max / close     → --chrome-win-img        / --chrome-win-close-img
+
+   9-slice frames have transparent centers (no `fill`) so the bitmaps show
+   through. Buttons are painted sprites, not slices. */
+
+html[data-skin="pack:y2k"] {
+  color-scheme: dark;
+  --bg: #1a1612;
+  --bg-raised: #2a241e;
+  --bg-input: #0c1410;
+  --fg: #f4e6c8;
+  --fg-dim: #a09070;
+  --edge: #6a5a40;
+  --edge-btn: #c4a060;
+  --mojo: #ff4d8d;
+  --code: #3dff9a;
+  --warn: #ffb020;
+  --error: #ff5a4a;
+  --mono: "Courier New", Courier, "Lucida Console", monospace;
+  --font-ui: "Trebuchet MS", "Segoe UI", Tahoma, sans-serif;
+  --font-mono: var(--mono);
+  --chrome-menubar-img: url("/skins/y2k/titlebar.svg");
+  --chrome-menubar-size: auto 100%;
+  --chrome-menubar-repeat: repeat-x;
+  --chrome-pane-img: url("/skins/y2k/pane-fill.svg");
+  --chrome-pane-size: auto;
+  --chrome-pane-repeat: repeat;
+  --chrome-btn-img: url("/skins/y2k/btn.svg");
+  --chrome-btn-hover-img: url("/skins/y2k/btn-hover.svg");
+  --chrome-btn-active-img: url("/skins/y2k/btn-down.svg");
+  --chrome-input-img: url("/skins/y2k/lcd.svg");
+  --chrome-input-size: auto;
+  --chrome-input-repeat: repeat;
+  --chrome-inputbar-img: url("/skins/y2k/inputbar.svg");
+  --chrome-inputbar-size: auto 100%;
+  --chrome-inputbar-repeat: repeat-x;
+  --chrome-status-img: url("/skins/y2k/status.svg");
+  --chrome-status-size: auto 100%;
+  --chrome-status-repeat: repeat-x;
+  --chrome-slot-img: url("/skins/y2k/titlebar.svg");
+  --chrome-slot-size: auto 100%;
+  --chrome-slot-repeat: repeat-x;
+  --chrome-win-img: url("/skins/y2k/win.svg");
+  --chrome-win-close-img: url("/skins/y2k/win-close.svg");
+  --texture-bg: url("/skins/y2k/bg.svg");
+  --texture-transcript: url("/skins/y2k/transcript.svg");
+  --slice-menubar: url("/skins/y2k/menubar.svg") 8 / 8px / 0 stretch;
+  --slice-pane: url("/skins/y2k/pane.svg") 10 / 10px / 0 stretch;
+  --slice-dock: url("/skins/y2k/pane.svg") 10 / 10px / 0 stretch;
+  --slice-btn: none;
+  --slice-flip: none;
+  --slice-scroll: none;
+}
+
+html[data-skin="pack:y2k"] #shell {
+  padding: 0 6px;
+}
+
+html[data-skin="pack:y2k"] #send,
+html[data-skin="pack:y2k"] #stop,
+html[data-skin="pack:y2k"] #flip,
+html[data-skin="pack:y2k"] .pane-action,
+html[data-skin="pack:y2k"] .slot-swap,
+html[data-skin="pack:y2k"] .slot-close,
+html[data-skin="pack:y2k"] .ql-btn,
+html[data-skin="pack:y2k"] #confirmbar button,
+html[data-skin="pack:y2k"] #jump-latest,
+html[data-skin="pack:y2k"] .win-btn {
+  border-radius: 2px;
+}
+
+html[data-skin="pack:y2k"] #send:active,
+html[data-skin="pack:y2k"] #stop:active,
+html[data-skin="pack:y2k"] #flip:active,
+html[data-skin="pack:y2k"] .pane-action:active,
+html[data-skin="pack:y2k"] .win-btn:active {
+  transform: translate(1px, 1px);
+}
+
+html[data-skin="pack:y2k"] #input {
+  border-radius: 2px;
+  box-shadow: inset 1px 1px 0 #000, inset -1px -1px 0 #c4a060;
+}
+
+html[data-skin="pack:y2k"] .menu-drop {
+  border-radius: 2px;
+  background: #2a241e;
+  border-color: #c4a060;
+  box-shadow: 1px 1px 0 #1a1410, -1px -1px 0 #e8dcc4;
+}
+
+html[data-skin="pack:y2k"] .turn-user {
+  border-radius: 2px;
+}
+
+html[data-skin="pack:y2k"] ::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+html[data-skin="pack:y2k"] ::-webkit-scrollbar-track {
+  background: #2a241e;
+  border: 1px solid #3a322c;
+}
+html[data-skin="pack:y2k"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(#e8dcc4, #6a5e4a);
+  border: 1px solid #3a322c;
+}
+html[data-skin="pack:y2k"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(#fff0d0, #8a7a60);
+}

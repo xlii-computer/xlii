@@ -1,0 +1,12 @@
+name = "diff-review"
+description = "Review the diff against a base ref (param: base, default HEAD~1)"
+
+[params.base]
+default = "HEAD~1"
+help = "git ref/commit to diff against"
+
+[[step]]
+run = "git diff {{base}}"
+
+[[step]]
+ask = """Review the diff above. Call out likely bugs, risky changes, and missing tests in 3-5 bullets. If it looks clean, say so."""

@@ -1,0 +1,15 @@
+{
+  "name": "xlii glass",
+  "short_name": "xlii",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#101014",
+  "theme_color": "#101014",
+  "icons": [
+    {
+      "src": "img/xlii-mark.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}

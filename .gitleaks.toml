@@ -1,0 +1,36 @@
+title = "iXaac-lab gitleaks config"
+
+# Keep gitleaks' full built-in ruleset, then layer our allowlist on top.
+# WITHOUT this block, supplying a config REPLACES the default rules entirely —
+# the scan would then have no rules and detect nothing.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allow list"
+paths = [
+  '''\.venv/''',
+  '''dist/''',
+  '''build/''',
+  '''tests/fixtures/''',
+  # Synthetic xai-SECRET-* fixtures for the `xlii keys migrate` round-trip test
+  # (e.g. "xai-SECRET-primary-0123456789abcdef") — not real credentials.
+  '''tests/test_keys_vault_migrate\.py''',
+  # Fake credential-shaped strings used to verify the shell-suggest redaction
+  # logic (e.g. ghp_* PATs, tok_* tokens) — intentionally realistic but not real.
+  '''tests/test_input_completions\.py''',
+  # TOTP tests pin the PUBLIC RFC 6238 test vector (base32 of the RFC's
+  # "12345678901234567890" seed) to prove interop — a published constant, not
+  # a credential.
+  '''tests/test_totp\.py''',
+  '''tests/test_daemon_elevation\.py''',
+  '''tests/test_daemon_elevation_dispatch\.py''',
+]
+
+# Belt-and-suspenders: ignore the obviously-fake test key prefix anywhere it
+# appears, so sibling fixtures don't re-trip the scan.
+regexes = [
+  '''xai-SECRET-[a-z]+-[0-9a-f]+''',
+  # RFC 6238 Appendix B public test-vector secret (base32 of "12345678901234567890").
+  '''GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ''',
+]

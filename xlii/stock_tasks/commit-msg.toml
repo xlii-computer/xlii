@@ -1,0 +1,8 @@
+name = "commit-msg"
+description = "Draft a Conventional Commits message from the staged diff (linear)"
+
+[[step]]
+run = "git diff --staged"
+
+[[step]]
+ask = """Write a Conventional Commits message for the staged diff above: a `type(scope): subject` line (72 chars max), a blank line, then a short body covering what changed and why. Output only the commit message."""

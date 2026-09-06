@@ -1,0 +1,27 @@
+name = "alpha-vantage-getChart"
+version = 1
+summary = "Stock quotes, OHLCV charts, ticker search, forex, crypto — 25 calls/day free (argus: alpha-vantage.getChart)"
+category = "finance"
+required_params = ["func", "query"]
+
+[request]
+method = "GET"
+url = "https://www.alphavantage.co/query"
+
+[request.params]
+function = "{func}"
+symbol = "{query}"
+outputsize = "compact"
+
+[auth]
+kind = "query"
+key_env = "ALPHA_VANTAGE_API_KEY"
+param = "apikey"
+required = true
+
+[quota]
+daily = 25
+bucket = "alpha-vantage"
+
+[shape]
+records = ""

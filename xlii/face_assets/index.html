@@ -1,0 +1,163 @@
+<!doctype html>
+<!-- The xlii face — iXaac-first chat surface over the protocol-v2 wire.
+     No-build vanilla ES modules; everything self-contained (no CDNs).
+     Served three ways: Tauri webview (handshake), bare browser against
+     `xlii serve --face` (?token=), or the public body's /face route. -->
+<html lang="en" data-pane-side="right">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#101014">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>xlii</title>
+  <!-- cache-bust: force Tauri/webview to reload face chrome after host-frame cut -->
+  <link rel="stylesheet" href="css/face.css?v=nobg1">
+  <!-- Lab-side flip stamp: fetched here, not on the first flip (no pop-in). -->
+  <link rel="preload" as="image" href="img/stamp-steel-mirror.png">
+  <link rel="preload" as="image" href="img/stamp-steel-mirror@2x.png">
+</head>
+<body data-ready="0">
+  <main id="shell">
+    <nav id="menubar" aria-label="menu"></nav>
+    <div id="hud-park"></div>
+    <div id="hud" hidden>
+      <span id="hud-surface" class="hud-chip" hidden title="folder kind"></span>
+      <span id="hud-model" class="hud-chip"></span>
+      <span id="hud-project" class="hud-chip"></span>
+      <span id="hud-cwd" class="hud-chip" hidden title="live desk"></span>
+      <span id="hud-persona" class="hud-chip"></span>
+      <span id="hud-journal" class="hud-chip" hidden title="project journal">jrnl</span>
+      <button type="button" id="hud-trust" class="hud-chip" data-trust="safe" title="bash gate">safe</button>
+      <button type="button" id="hud-tier" class="hud-chip" hidden title="chat tier"></button>
+      <button type="button" id="hud-browser" class="hud-chip" hidden title="agent browser">browse</button>
+    </div>
+    <!-- Two visual slots. Each is stream or a pane. Input stays below. -->
+    <div id="workspace" class="solo">
+      <section id="slot-a" class="slot" data-slot="a" data-view="stream">
+        <header class="slot-chrome">
+          <div class="slot-here" aria-live="polite">
+            <span class="slot-here-kind">stream</span>
+            <span class="slot-here-loc"></span>
+          </div>
+          <select class="slot-pick" aria-label="change slot a"></select>
+          <button type="button" class="slot-swap" title="swap sides" hidden>⇄</button>
+          <button type="button" class="slot-close" title="close" hidden>✕</button>
+        </header>
+        <div class="slot-body" id="slot-a-body">
+          <div id="transcript" aria-live="polite"></div>
+          <button type="button" id="jump-latest" hidden title="jump to latest">↓ latest</button>
+        </div>
+      </section>
+      <div id="pane-resize" title="drag to resize" role="separator" aria-orientation="vertical" hidden></div>
+      <section id="slot-b" class="slot" data-slot="b" hidden>
+        <header class="slot-chrome">
+          <div class="slot-here" aria-live="polite">
+            <span class="slot-here-kind"></span>
+            <span class="slot-here-loc"></span>
+          </div>
+          <select class="slot-pick" aria-label="change slot b"></select>
+          <button type="button" class="slot-swap" title="swap sides" hidden>⇄</button>
+          <button type="button" class="slot-close" title="close">✕</button>
+        </header>
+        <div class="slot-body" id="slot-b-body">
+          <aside id="panedeck" hidden aria-label="panel">
+            <div id="panepanel" hidden>
+              <div id="pane-title"></div>
+              <div id="pane-rows"></div>
+              <div id="pane-actions"></div>
+            </div>
+            <div id="panetabs" hidden aria-hidden="true"></div>
+          </aside>
+        </div>
+      </section>
+    </div>
+    <div id="stream-park" hidden>
+      <div id="transcript-peek" hidden aria-live="off"></div>
+    </div>
+    <div id="pane-host-a" class="panepanel" hidden>
+      <div class="pane-title"></div>
+      <div class="pane-rows"></div>
+      <div class="pane-actions"></div>
+    </div>
+    <div id="about-card" hidden>
+      <div class="about-card" role="dialog" aria-label="About">
+        <button type="button" class="about-close" title="close">✕</button>
+        <div class="about-product">xlii</div>
+        <div class="about-credit"></div>
+        <div class="about-version"></div>
+        <div class="about-facts"></div>
+        <div class="about-signs"></div>
+        <div class="about-line"></div>
+        <button type="button" class="about-next">Another line</button>
+      </div>
+    </div>
+    <div id="confirmbar" hidden role="alertdialog" aria-labelledby="confirm-prompt">
+      <div id="confirm-prompt"></div>
+      <div id="confirm-actions">
+        <span id="confirm-keys" class="confirm-keys">y approve · n deny</span>
+        <button id="confirm-approve" type="button">approve</button>
+        <button id="confirm-deny" type="button">deny</button>
+      </div>
+    </div>
+    <div id="heartbeat" hidden aria-live="polite">
+      <span id="hb-spin"></span>
+      <span id="hb-label">working</span>
+    </div>
+    <!-- Live job count only. Completions notify in the stream, not here. -->
+    <div id="quickstrip" hidden aria-label="session flags"></div>
+    <div id="focuschip" hidden aria-live="polite"></div>
+    <div id="completions" hidden role="listbox" aria-label="slash commands"></div>
+    <div id="msgqueue" hidden aria-label="queued messages"></div>
+    <div id="thumbbar" hidden aria-label="phone glass">
+      <button type="button" id="thumb-mark" title="mark last turn">mark</button>
+      <button type="button" id="thumb-panes" title="marks and git">panes</button>
+      <button type="button" id="thumb-lock" title="lock sitting">lock</button>
+    </div>
+    <div id="inputbar">
+      <button id="flip" type="button" title="talk or lab" aria-label="talk or lab">
+        <span id="flip-name" class="flip-name" hidden></span>
+        <span class="flip-pair">
+          <img id="flip-mark" class="flip-mark" src="img/stamp-steel.png" alt=""
+               srcset="img/stamp-steel.png 1x, img/stamp-steel@2x.png 2x"
+               width="32" height="32" draggable="false">
+        </span>
+      </button>
+      <textarea id="input" rows="1" autofocus
+                placeholder="connecting…"></textarea>
+      <div id="input-actions">
+        <button id="voice" type="button" hidden title="speak" aria-label="speak">mic</button>
+        <button id="stop" hidden title="cancel the running turn">stop</button>
+        <button id="send" title="send">&gt;</button>
+      </div>
+    </div>
+    <div id="fkeybar" hidden aria-label="function keys"></div>
+    <div id="statusbar">
+      <span id="mode-chip"></span>
+      <span id="hint"></span>
+      <span id="exit-hint"></span>
+      <span id="hud-usage" hidden>
+        <span id="hud-meter" hidden title="context window — this sitting, all streams"></span>
+        <span id="hud-session" hidden title="billed this sitting — all streams"></span>
+      </span>
+      <span id="conn" data-state="connecting">connecting</span>
+    </div>
+  </main>
+  <input type="file" id="filepick" hidden multiple>
+  <div id="glass" hidden data-mode="">
+    <div class="glass-card">
+      <div id="glass-title">locked</div>
+      <p id="glass-copy">unlock on this desk</p>
+      <input id="glass-code" type="password" hidden autocomplete="off"
+             placeholder="code">
+      <div class="glass-actions">
+        <button id="glass-lock" type="button">lock</button>
+        <button id="glass-unlock" type="button">unlock</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="js/app.js?v=flip2"></script>
+</body>
+</html>

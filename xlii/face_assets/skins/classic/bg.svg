@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="cl-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a2a2a"/>
+      <stop offset="0.5" stop-color="#1c1c1c"/>
+      <stop offset="1" stop-color="#242424"/>
+    </linearGradient>
+    <pattern id="cl-brush" width="64" height="4" patternUnits="userSpaceOnUse">
+      <path d="M0 1h64" stroke="#c8c8c8" stroke-width="0.5" opacity="0.16"/>
+      <path d="M0 3h64" stroke="#000" stroke-width="0.5" opacity="0.32"/>
+    </pattern>
+  </defs>
+  <rect width="64" height="64" fill="url(#cl-bg)"/>
+  <rect width="64" height="64" fill="url(#cl-brush)"/>
+</svg>

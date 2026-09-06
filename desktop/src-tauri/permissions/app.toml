@@ -1,0 +1,18 @@
+# App IPC commands used by the face asset shell (pre-navigate) and title-bar
+# chrome. Live face pages at http://127.0.0.1 use the URL token and do not need
+# these once wire.js prefers the query string over invoke().
+
+[[permission]]
+identifier = "allow-handshake"
+description = "Allow the face to read the sidecar handshake (port + token)."
+commands.allow = ["handshake"]
+
+[[permission]]
+identifier = "allow-spawn-error"
+description = "Allow the face to read sidecar spawn failures."
+commands.allow = ["spawn_error"]
+
+[[permission]]
+identifier = "allow-prepare-close"
+description = "Allow the live face to arm a real window close after graceful exit."
+commands.allow = ["prepare_close"]

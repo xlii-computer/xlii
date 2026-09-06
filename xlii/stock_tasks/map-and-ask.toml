@@ -1,0 +1,16 @@
+name = "map-and-ask"
+description = "Map a directory layout, then answer a question (params: path, question)"
+
+[params.path]
+default = "."
+help = "directory to map"
+
+[params.question]
+required = true
+help = "what to find or explain"
+
+[[step]]
+run = "find {{path}} -maxdepth 2 -type f 2>/dev/null | head -50"
+
+[[step]]
+ask = """From the listing above, briefly map the layout (2-4 bullets), then answer: {{question}}"""

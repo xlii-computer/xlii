@@ -1,0 +1,15 @@
+name = "blockstream-address"
+version = 1
+summary = "Bitcoin address lookup — balance, transactions, UTXO data (argus: blockstream.address)"
+category = "finance"
+required_params = ["addr"]
+
+[request]
+method = "GET"
+url = "https://blockstream.info/api/address/{addr}"
+
+[quota]
+daily = 300
+
+[shape]
+records = ""

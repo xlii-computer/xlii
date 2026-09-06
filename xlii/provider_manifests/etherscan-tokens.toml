@@ -1,0 +1,39 @@
+name = "etherscan-tokens"
+version = 1
+summary = "Ethereum address balance, transactions, token holdings — V2 API supports 60+ chains (argus: etherscan.tokens)"
+category = "finance"
+required_params = ["addr", "chainId"]
+
+[request]
+method = "GET"
+url = "https://api.etherscan.io/v2/api"
+
+[request.params]
+chainid = "{chainId}"
+module = "account"
+action = "tokentx"
+address = "{addr}"
+page = "1"
+offset = "20"
+sort = "desc"
+
+[auth]
+kind = "query"
+key_env = "ETHERSCAN_API_KEY"
+param = "apikey"
+required = true
+
+[quota]
+daily = 1000
+
+[shape]
+records = "result"
+
+[shape.fields]
+token = "tokenName"
+symbol = "tokenSymbol"
+from = "from"
+to = "to"
+value = "value"
+date = "timeStamp"
+contractAddress = "contractAddress"

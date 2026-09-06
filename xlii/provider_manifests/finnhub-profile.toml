@@ -1,0 +1,24 @@
+name = "finnhub-profile"
+version = 1
+summary = "Real-time quotes, company profiles, earnings, news — 60 calls/min free (argus: finnhub.profile)"
+category = "finance"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://finnhub.io/api/v1/stock/profile2"
+
+[request.params]
+symbol = "{query}"
+
+[auth]
+kind = "query"
+key_env = "FINNHUB_API_KEY"
+param = "token"
+required = true
+
+[quota]
+daily = 5000
+
+[shape]
+records = ""

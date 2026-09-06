@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# xlii private runtime state
+.xlii/
+.xli/
+# harness --context handoff (DeepContext MCP registration, per-machine)
+.grok/
+
+# Build/test artifacts
+.coverage
+coverage.xml
+
+# Local editor / agent caches (do not publish)
+.claude/
+.cursor/
+.import_linter_cache/
+*.code-workspace

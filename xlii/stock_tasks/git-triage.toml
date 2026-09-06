@@ -1,0 +1,30 @@
+name = "git-triage"
+description = "Branch on a clean-vs-dirty working tree (agent verdict routes the arm)"
+
+[[step]]
+id = "status"
+run = "git status -sb"
+
+[[step]]
+id = "classify"
+ask = """Look at the git status above. If the working tree has uncommitted changes the branch is dirty; if it is clean the branch is clean. Reply with one short sentence, then a FINAL line that is exactly one of:
+TASK+ {"branch": "clean"}
+TASK+ {"branch": "dirty"}"""
+
+[[step]]
+id = "clean"
+ask = """The working tree is clean. Suggest one worthwhile next task for this project, in a single sentence."""
+
+[[step]]
+id = "dirty"
+ask = """The working tree has uncommitted changes. In two bullets, suggest how to group them into logical commits."""
+
+[[edge]]
+from = "classify"
+when = { branch = "clean" }
+to = "clean"
+
+[[edge]]
+from = "classify"
+when = { branch = "dirty" }
+to = "dirty"

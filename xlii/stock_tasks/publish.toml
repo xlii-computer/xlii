@@ -1,0 +1,25 @@
+name = "publish"
+description = "Publish a local app dir to the appbox docroot — live at <name>.<domain> (params: name, domain, src, conn, root)"
+
+[params.name]
+required = true
+help = "app label — becomes the subdomain"
+
+[params.domain]
+required = true
+help = "apps domain the box serves (e.g. example.com); copy this task and set a default to make /publish <name> one-word"
+
+[params.src]
+default = "."
+help = "local directory to publish"
+
+[params.conn]
+default = "appbox"
+help = "remote connection name (xlii remote add)"
+
+[params.root]
+default = "srv/apps"
+help = "docroot base on the box, relative to the SSH login home"
+
+[[step]]
+run = "xlii remote publish {{src}} sftp://{{conn}}/{{root}}/{{name}}.{{domain}}"

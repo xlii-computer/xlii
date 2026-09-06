@@ -1,0 +1,12 @@
+name = "explain-file"
+description = "Read a file and explain it (param: path required)"
+
+[params.path]
+required = true
+help = "file to read and explain"
+
+[[step]]
+run = "cat -- {{path}}"
+
+[[step]]
+ask = """Explain the file above: its purpose, the key pieces, and anything surprising or risky. Be concise (5 bullets max)."""

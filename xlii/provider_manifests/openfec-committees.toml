@@ -1,0 +1,40 @@
+name = "openfec-committees"
+version = 1
+summary = "Campaign contributions, PAC receipts, candidate financials, donor lookup (argus: openfec.committees)"
+category = "compliance"
+required_params = [ "query"]
+
+[defaults]
+limit = "25"
+
+[request]
+method = "GET"
+url = "https://api.open.fec.gov/v1/committees/"
+
+[request.params]
+q = "{query}"
+per_page = "{limit}"
+
+[auth]
+kind = "query"
+key_env = "OPENFEC_API_KEY"
+param = "api_key"
+required = true
+
+[quota]
+daily = 1000
+
+[shape]
+records = "results"
+
+[shape.fields]
+name = "name"
+committeeId = "committee_id"
+committeeType = "committee_type_full"
+designation = "designation_full"
+party = "party_full"
+state = "state"
+treasurer = "treasurer_name"
+filingFrequency = "filing_frequency"
+organizationType = "organization_type_full"
+sourceUrl = "committee_id"

@@ -1,0 +1,7 @@
+.venv/
+venv/
+build/
+dist/
+node_modules/
+tests/fixtures/
+*.min.js

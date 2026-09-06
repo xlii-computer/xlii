@@ -1,0 +1,25 @@
+name = "nyt"
+version = 1
+summary = "New York Times Article Search — decades of archived news, full-text search (argus: nyt.query)"
+category = "intel"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
+
+[request.params]
+q = "{query}"
+sort = "newest"
+
+[auth]
+kind = "query"
+key_env = "NYT_API_KEY"
+param = "api-key"
+required = true
+
+[quota]
+daily = 1000
+
+[shape]
+records = "response.docs"

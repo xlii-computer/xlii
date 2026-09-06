@@ -1,0 +1,306 @@
+# Help corpus manifest — source of truth for /howto + /describe routing.
+#
+# Tiers:
+#   core      → bundled into xlii/help/ by scripts/bundle_help.py (offline).
+#   extended  → GitHub-sourced + etag-cached (~/.cache/xlii/help), always current.
+# Help bar: every topic (except index) needs menu: (≤22 chars) and
+# group: start|work|more. check_docs fails a missing pair so a new
+# shard cannot blow the dropdown off-screen.
+# Per-command docs (commands/*.md) power /describe fusion: live registry facts
+# from code + this expansive prose from GitHub. see_also wires the graph.
+# Remote fetch: raw.githubusercontent.com/{repo}/{ref}/{base_path}/...
+# Override the ref with the XLII_HELP_REF env var.
+
+version: 2
+repo: xlii-computer/xlii
+ref: main
+base_path: docs/help
+
+topics:
+  # --- core tier (bundled, offline-complete) ---
+  index:
+    title: Help topic index
+    path: topics/index.md
+    tier: core
+    aliases: [topics, list]
+
+  install:
+    title: Install & first-time setup
+    menu: Install
+    group: start
+    path: topics/install.md
+    tier: core
+    aliases: [setup, bootstrap]
+    tags: [install, keys, doctor, setup]
+    see_also: [config-models, first-session, troubleshoot]
+
+  first-session:
+    title: First session — scratch home, then code or chat
+    menu: First session
+    group: start
+    path: topics/first-session.md
+    tier: core
+    aliases: [start, beginner, onboarding, scratch]
+    tags: [repl, scratch, code, chat, routing]
+    see_also: [modes, knowledge, help-system]
+
+  troubleshoot:
+    title: Troubleshooting common problems
+    menu: Troubleshoot
+    group: start
+    path: topics/troubleshooting.md
+    tier: core
+    aliases: [fix, troubleshooting, debug, errors]
+    tags: [errors, doctor, sync, tui]
+    see_also: [install, sessions-projects, terminal-selection]
+
+  terminal-selection:
+    title: Selecting & copying text in the TUI
+    menu: TUI selection
+    group: start
+    path: topics/terminal-selection.md
+    tier: core
+    aliases: [selection, copy, clipboard, drag, ctrl+c, in-app, shift-drag, mouse]
+    tags: [tui, selection, copy, clipboard, drag, ctrl+c, in-app, mouse, osc52, shift-drag]
+    see_also: [input-completions, troubleshoot, modes, first-session]
+
+  input-completions:
+    title: "Input completions: :shortcode: symbols & shell ghost text"
+    menu: Completions
+    group: start
+    path: topics/input-completions.md
+    tier: core
+    aliases: [shortcode, shortcodes, ghost-text, autosuggest, symbols, unicode]
+    tags: [tui, input, completion, shortcode, unicode, shell, ghost-text, autosuggest]
+    see_also: [terminal-selection, modes, first-session]
+
+  help-system:
+    title: Getting help — /help vs /howto vs /describe
+    menu: Getting help
+    group: start
+    path: topics/help-system.md
+    tier: core
+    aliases: [help, discover, discovery, self-help]
+    tags: [help, describe, howto, discovery]
+    see_also: [first-session, modes]
+
+  workflows:
+    title: Workflow recipes — plan, loop, swarm, review
+    menu: Workflows
+    group: start
+    path: topics/workflows.md
+    tier: core
+    aliases: [workflow, cursor-parity, ship, debug-flaky, cursor-delegate]
+    tags: [workflow, plan, rail, loop, swarm, cursor, debug]
+    see_also: [modes, rail, loop-swarm, review, bridges, gigwork]
+
+  # --- extended tier (GitHub-sourced, always current) ---
+  modes:
+    title: Modes & gates — plan, rail, loop, yolo
+    menu: Modes
+    group: work
+    path: topics/modes.md
+    tier: extended
+    aliases: [mode, gates, plan-mode]
+    tags: [plan, rail, loop, swarm, yolo, safe, execute]
+    see_also: [rail, loop-swarm, review, help-system]
+
+  knowledge:
+    title: Knowledge & context — doc, ref, bookmarks, locker
+    menu: Knowledge
+    group: work
+    path: topics/knowledge.md
+    tier: extended
+    aliases: [context, memory, attachments]
+    tags: [doc, ref, bookmark, bookmarks, mark, recall, lib, locker, loadout, skill]
+    see_also: [personas-loadouts, bridges, first-session]
+
+  rail:
+    title: The Coding Rail — six-stage pipeline
+    menu: Coding rail
+    group: work
+    path: topics/rail.md
+    tier: extended
+    aliases: [coding-rail, pipeline]
+    tags: [rail, plan, execute, stages]
+    see_also: [modes, loop-swarm]
+
+  loop-swarm:
+    title: Autonomous loop, writer swarm & task pipes
+    menu: Loop & swarm
+    group: work
+    path: topics/loop-swarm.md
+    tier: extended
+    aliases: [loop, swarm, autonomous, tasks, pipe]
+    tags: [loop, swarm, tasks, pipe, judges, gates, verify]
+    see_also: [review, modes, rail]
+
+  review:
+    title: Review & verification — verify, peer, consult
+    menu: Review
+    group: work
+    path: topics/review.md
+    tier: extended
+    aliases: [verify, judges, second-opinion]
+    tags: [verify, peer, consult, judge, cross-vendor]
+    see_also: [loop-swarm, bridges, gigwork]
+
+  gigwork:
+    title: Gigwork & gaggles — hire a foreign brain
+    menu: Gigwork
+    group: more
+    path: topics/gigwork.md
+    tier: extended
+    aliases: [gaggle, gig, gigwork-gaggle, "gigwork gaggle"]
+    tags: [gigwork, gaggle, jam, kimi, second-opinion, dispatch]
+    see_also: [review, workflows, bridges]
+
+  plugins:
+    title: Plugins — markdown capabilities
+    menu: Plugins
+    group: more
+    path: topics/plugins.md
+    tier: extended
+    aliases: [plugin, capabilities]
+    tags: [plugin, tools, actions]
+    see_also: [knowledge, config-models]
+
+  personas-loadouts:
+    title: Personas & loadouts
+    menu: Personas
+    group: more
+    path: topics/personas-loadouts.md
+    tier: extended
+    aliases: [persona, loadout, workspace, profiles]
+    tags: [persona, loadout, workspace, chat]
+    see_also: [knowledge, first-session]
+
+  bridges:
+    title: Bridges — DeepContext (Grok Build) & Cursor/Composer
+    menu: Bridges
+    group: more
+    path: topics/bridges.md
+    tier: extended
+    aliases: [bridge, mcp, deepcontext, cursor, composer, acp]
+    tags: [mcp, deepcontext, grok-build, cursor, composer, acp]
+    see_also: [knowledge, review]
+
+  sessions-projects:
+    title: Sessions & projects
+    menu: Sessions
+    group: more
+    path: topics/sessions-projects.md
+    tier: extended
+    aliases: [session, project, workspace-dir]
+    tags: [session, project, sync, reset, cwd]
+    see_also: [troubleshoot, config-models]
+
+  config-models:
+    title: Config, models & keys
+    menu: Config & keys
+    group: more
+    path: topics/config-models.md
+    tier: extended
+    aliases: [config, models, keys, settings]
+    tags: [config, model, keys, auth, temp]
+    see_also: [install, plugins]
+
+  storage-backends:
+    title: Writing a storage backend — the conformance on-ramp
+    menu: Storage
+    group: more
+    path: topics/storage-backends.md
+    tier: extended
+    aliases: [storage, backend, backends, adapter]
+    tags: [storage, backend, collections, local, conformance, sync, adapter]
+    see_also: [knowledge, sessions-projects]
+
+  # remote-backends Vectors W+M (2026-07-05): the WebDAV + SMB wires join /remote.
+  remote-webdav:
+    title: WebDAV remotes — Nextcloud/ownCloud over dav://
+    menu: WebDAV
+    group: more
+    path: topics/remote-webdav.md
+    tier: extended
+    aliases: [webdav, dav, nextcloud, owncloud]
+    tags: [remote, webdav, dav, nextcloud, owncloud, publish, https, bearer]
+    see_also: [knowledge, troubleshoot]
+
+  remote-smb:
+    title: SMB/CIFS shares — NAS & Windows over smb://
+    menu: SMB
+    group: more
+    path: topics/remote-smb.md
+    tier: extended
+    aliases: [smb, cifs, nas, windows-share, samba]
+    tags: [remote, smb, cifs, nas, share, domain, windows, samba]
+    see_also: [knowledge, troubleshoot]
+
+# Per-command expansive docs for /describe fusion. The live registry remains the
+# source of truth for signatures/flags; these add prose + graph edges, fetched
+# from GitHub (always current) and etag-cached.
+commands:
+  plan:    {path: commands/plan.md,    topic: modes,             see_also: [execute, rail, discovery]}
+  execute: {path: commands/execute.md, topic: modes,             see_also: [plan, rail]}
+  discovery: {path: commands/discovery.md, topic: modes,         see_also: [plan, rail]}
+  rail:    {path: commands/rail.md,    topic: rail,              see_also: [plan, loop]}
+  loop:    {path: commands/loop.md,    topic: loop-swarm,        see_also: [swarm, verify, rail]}
+  swarm:   {path: commands/swarm.md,   topic: loop-swarm,        see_also: [loop, verify]}
+  model:   {path: commands/model.md,   topic: config-models,     see_also: [swarm, loadout]}
+  verify:  {path: commands/verify.md,  topic: review,            see_also: [peer, consult, loop]}
+  peer:    {path: commands/peer.md,    topic: review,            see_also: [verify, consult]}
+  consult: {path: commands/consult.md, topic: review,            see_also: [verify, peer]}
+  jam:     {path: commands/jam.md,     topic: gigwork,           see_also: [gaggle, gigwork, consult]}
+  gaggle:  {path: commands/jam.md,     topic: gigwork,           see_also: [jam, gigwork, consult]}
+  gigwork: {path: commands/gigwork.md, topic: gigwork,           see_also: [gaggle, jam, consult]}
+  doc:     {path: commands/doc.md,     topic: knowledge,         see_also: [attach, ref, loadout, locker]}
+  ref:     {path: commands/ref.md,     topic: knowledge,         see_also: [recall, doc, plugin]}
+  loadout: {path: commands/loadout.md, topic: personas-loadouts, see_also: [persona, doc]}
+  locker:  {path: commands/locker.md,  topic: knowledge,         see_also: [upload, doc]}
+  browse:  {path: commands/browse.md,  topic: sessions-projects, see_also: [upload, locker, status]}
+  context: {path: commands/context.md, topic: bridges,           see_also: [cursor, loadout]}
+  cursor:  {path: commands/cursor.md,  topic: bridges,           see_also: [context, consult]}
+  persona: {path: commands/persona.md, topic: personas-loadouts, see_also: [loadout, edit]}
+  edit:    {path: commands/edit.md,    topic: personas-loadouts, see_also: [browse, doc, persona]}
+  skill:   {path: commands/skill.md,   topic: knowledge,         see_also: [doc, howto, loadout]}
+  # interaction-layer-ii (2026-06-28): new commands from the 6-vector build.
+  bookmarks: {path: commands/bookmarks.md, topic: knowledge,         see_also: [ref, doc, persona]}
+  editthis:  {path: commands/editthis.md,  topic: personas-loadouts, see_also: [edit, doc, browse]}
+  tasks:     {path: commands/tasks.md,     topic: loop-swarm,        see_also: [loop, swarm, rail, cursor, bind, project]}
+  project:   {path: commands/project.md,   topic: sessions-projects, see_also: [session, tasks]}
+  projects:  {path: commands/project.md,   topic: sessions-projects, see_also: [project, session, tasks]}
+  bind:      {path: commands/bind.md,      topic: loop-swarm,        see_also: [tasks]}
+  replay:    {path: commands/replay.md,    topic: sessions-projects, see_also: [consult, cursor]}
+  # session-persistence docs (2026-07-11): episodes join the /describe graph.
+  session:   {path: commands/session.md,   topic: sessions-projects, see_also: [replay, reset, status]}
+  # open-substrate (2026-07-05): harness front doors join the /describe graph.
+  claude:      {path: commands/claude.md,     topic: bridges, see_also: [cursor, grok-build, consult]}
+  grok-build:  {path: commands/grok-build.md, topic: bridges, see_also: [cursor, claude, context]}
+  # the-fold Round 1 (2026-07-04): consolidated verbs, plugin surface, trusted-run tier.
+  attach:  {path: commands/attach.md, topic: knowledge, see_also: [detach, recall, doc, loadout]}
+  detach:  {path: commands/attach.md, topic: knowledge, see_also: [attach, recall]}
+  recall:  {path: commands/ref.md,    topic: knowledge, see_also: [attach, bookmarks, doc]}
+  plugin:  {path: commands/plugin.md, topic: plugins,   see_also: [doc, loadout]}
+  yolo:    {path: commands/yolo.md,   topic: modes,     see_also: [plan, loop]}
+  # remote-backends Base (2026-07-05): /ftp → /remote (hidden alias), honest per-wire schemes.
+  remote:  {path: commands/remote.md, topic: knowledge, see_also: [attach, locker, doc]}
+  # repo-map vector (2026-07-06): the project's shape as a first-class surface.
+  map:     {path: commands/map.md,    topic: knowledge, see_also: [attach, doc, gitpain]}
+  gitpain: {path: commands/gitpain.md, topic: sessions-projects, see_also: [browse, checkpoint, git]}
+  mail:    {path: commands/mail.md,   topic: knowledge, see_also: [locker, attach, role]}
+  # three-faces product packs (2026-08-12): home|chat|code · switch verb · research on chat.
+  workbench: {path: commands/workbench.md, topic: sessions-projects, see_also: [session, plugin, panel]}
+  home: {path: commands/home.md, topic: sessions-projects, see_also: [workbench]}
+  # text hygiene + credibility (2026-08-12): paste/harness/BOM/CRLF/stego scan+strip.
+  hygiene:  {path: commands/hygiene.md,  topic: sessions-projects, see_also: [xtool, session]}
+  sanitize: {path: commands/hygiene.md,  topic: sessions-projects, see_also: [hygiene]}
+  destroy-all: {path: commands/destroy-all.md, topic: sessions-projects, see_also: [yolo]}
+  factory-reset: {path: commands/destroy-all.md, topic: sessions-projects, see_also: [destroy-all]}
+  clear: {path: commands/clear.md, topic: sessions-projects, see_also: [replay, session]}
+  cls: {path: commands/clear.md, topic: sessions-projects, see_also: [clear]}
+  clear-screen: {path: commands/clear.md, topic: sessions-projects, see_also: [clear]}
+  lock: {path: commands/lock.md, topic: sessions-projects, see_also: [remote-control]}
+  unlock: {path: commands/lock.md, topic: sessions-projects, see_also: [lock]}
+  remote-control: {path: commands/remote-control.md, topic: sessions-projects, see_also: [lock]}
+  mute: {path: commands/remote-control.md, topic: sessions-projects, see_also: [remote-control]}
+  panic-mail: {path: commands/panic-mail.md, topic: sessions-projects, see_also: [destroy-all, lock]}

@@ -1,0 +1,8 @@
+name = "changelog"
+description = "Group recent commits into changelog notes (linear)"
+
+[[step]]
+run = "git log -15 --pretty=format:'%h %s'"
+
+[[step]]
+ask = """Turn the recent commits above into terse changelog notes grouped under Added / Changed / Fixed. One bullet per meaningful change; drop noise such as merges and typo fixes."""

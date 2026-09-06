@@ -1,0 +1,2112 @@
+/* The xlii face — chat-first. Skins via html[data-skin=…]; CSS vars drive chrome.
+   Magenta = mojo/iXaac companion, green = code lab. */
+
+:root,
+html[data-skin="dark"] {
+  color-scheme: dark;
+  --bg: #101014;
+  --bg-raised: #17171d;
+  --bg-input: #1c1c24;
+  --fg: #d8d8de;
+  --fg-dim: #7a7a85;
+  --edge: #2a2a33;
+  --edge-btn: #454552; /* input-bar buttons: a step up from --edge so they read as controls */
+  --mojo: #c678dd;
+  --code: #7ec87e;
+  --warn: #d0b060;
+  --error: #d07070;
+  --mono: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--mono);
+  /* Graphical slots — empty on built-ins (pixel-equivalent). Packs fill these.
+     Winamp map: texture-bg ≈ main.bmp, chrome-menubar-img ≈ titlebar.bmp,
+     chrome-btn-* ≈ cbuttons.bmp (up/hover/down), chrome-pane-img ≈ pledit.bmp,
+     chrome-input-img + texture-transcript ≈ the LCD, chrome-inputbar-img ≈
+     the bottom of main, chrome-win-* ≈ titlebar min/max/close. */
+  --chrome-menubar-img: none;
+  --chrome-pane-img: none;
+  --chrome-btn-img: none;
+  --chrome-btn-hover-img: none;
+  --chrome-btn-active-img: none;
+  --chrome-input-img: none;
+  --chrome-inputbar-img: none;
+  --chrome-status-img: none;
+  --chrome-slot-img: none;
+  --chrome-win-img: none;
+  --chrome-win-close-img: none;
+  --texture-bg: none;
+  --texture-transcript: none;
+  --slice-menubar: none;
+  --slice-pane: none;
+  --slice-dock: none;
+  --slice-btn: none;
+  --slice-flip: none;
+  --slice-scroll: none;
+}
+
+/* Light — readable day desk (not a Textual theme port). */
+html[data-skin="light"] {
+  color-scheme: light;
+  --bg: #f4f4f7;
+  --bg-raised: #ffffff;
+  --bg-input: #ebebf0;
+  --fg: #1a1a22;
+  --fg-dim: #5c5c6a;
+  --edge: #d0d0da;
+  --edge-btn: #a8a8b8;
+  --mojo: #9b4dca;
+  --code: #2f7a3e;
+  --warn: #9a6b12;
+  --error: #b04040;
+}
+
+/* Slate — cooler blue-gray. */
+html[data-skin="slate"] {
+  color-scheme: dark;
+  --bg: #0e141b;
+  --bg-raised: #15202b;
+  --bg-input: #1a2836;
+  --fg: #d7e0ea;
+  --fg-dim: #7a8fa3;
+  --edge: #243447;
+  --edge-btn: #3a5168;
+  --mojo: #b57bdb;
+  --code: #6fcf97;
+  --warn: #e0b050;
+  --error: #e07070;
+}
+
+/* Mojo — companion-forward, purple lift. */
+html[data-skin="mojo"] {
+  color-scheme: dark;
+  --bg: #120f18;
+  --bg-raised: #1a1524;
+  --bg-input: #221a30;
+  --fg: #e8e0f0;
+  --fg-dim: #8a7a9a;
+  --edge: #342848;
+  --edge-btn: #4a3a62;
+  --mojo: #d48cff;
+  --code: #7ec87e;
+  --warn: #d0b060;
+  --error: #d07070;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background-color: var(--bg);
+  background-image: var(--texture-bg);
+  background-repeat: repeat;
+  color: var(--fg);
+  font: 15px/1.5 var(--font-ui);
+}
+
+/* Undecorated Tauri host: a 1px inner edge stands in for the OS frame
+   so the product doesn't dissolve into the wallpaper. Browser tabs skip
+   this (no .tauri-host). */
+html.tauri-host { overflow: hidden; }
+html.tauri-host body {
+  outline: 1px solid var(--edge);
+  outline-offset: -1px;
+}
+
+/* Fill the host window (Tauri default ~1100px used to leave fat empty
+   gutters around a 860px column). Panel open still steals from #workspace
+   inside this shell — the shell itself is full-bleed. */
+#shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+/* Upper band only: transcript | side panel. Input stack is a sibling below.
+   Panel open steals width from the transcript inside this fixed shell. */
+#workspace {
+  --split-left: 50%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+}
+
+.slot {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.slot[hidden] { display: none !important; }
+#workspace.solo .slot { flex: 1; }
+/* Dual: visual-left column is --split-left (last drag). Same split for
+   stream-dock, dual-place, dual-stream, and html-place — no jump. */
+#workspace:not(.solo)[data-pane-side="right"] #slot-a,
+#workspace:not(.solo):not([data-pane-side]) #slot-a {
+  flex: 0 0 var(--split-left);
+  width: var(--split-left);
+  min-width: 160px;
+  max-width: none;
+}
+#workspace:not(.solo)[data-pane-side="right"] #slot-b,
+#workspace:not(.solo):not([data-pane-side]) #slot-b {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 160px;
+  max-width: none;
+}
+#workspace:not(.solo)[data-pane-side="left"] #slot-b {
+  flex: 0 0 var(--split-left);
+  width: var(--split-left);
+  min-width: 160px;
+  max-width: none;
+}
+#workspace:not(.solo)[data-pane-side="left"] #slot-a {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 160px;
+  max-width: none;
+}
+.slot.slot-peek .slot-here-kind { color: var(--fg-dim); }
+
+.slot-chrome {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-bottom: 1px solid var(--edge);
+  background-color: var(--bg-raised);
+  background-image: var(--chrome-slot-img);
+  background-size: var(--chrome-slot-size, 100% 100%);
+  background-repeat: var(--chrome-slot-repeat, no-repeat);
+  min-width: 0;
+}
+.slot-here {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font: 11px var(--mono);
+}
+.slot-chrome.has-hud .slot-here {
+  flex: 0 1 auto;
+  max-width: 28%;
+}
+.slot-chrome.has-hud .slot-pick { margin-left: auto; }
+.slot-here-kind {
+  flex: 0 0 auto;
+  color: var(--fg);
+}
+.slot-here-loc {
+  flex: 1;
+  min-width: 0;
+  color: var(--fg-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.slot-pick {
+  flex: 0 0 auto;
+  width: 7.5rem;
+  max-width: 36%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--bg);
+  background-image: linear-gradient(45deg, transparent 50%, var(--fg-dim) 50%),
+    linear-gradient(135deg, var(--fg-dim) 50%, transparent 50%);
+  background-position: calc(100% - 11px) 50%, calc(100% - 6px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  color: var(--fg);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  font: 11px var(--mono);
+  padding: 2px 18px 2px 6px;
+}
+.slot-pick:focus {
+  outline: 1px solid var(--edge-btn);
+  outline-offset: 0;
+  background-color: var(--bg);
+}
+.slot-pick option {
+  background-color: var(--bg-raised);
+  color: var(--fg);
+}
+.slot-swap,
+.slot-close {
+  flex: 0 0 auto;
+  background-color: transparent;
+  background-image: var(--chrome-btn-img);
+  background-size: var(--chrome-btn-size, 100% 100%);
+  background-repeat: var(--chrome-btn-repeat, no-repeat);
+  border: 1px solid var(--edge);
+  border-image: var(--slice-btn);
+  color: var(--fg-dim);
+  border-radius: 6px;
+  font: 11px var(--mono);
+  padding: 1px 7px;
+  cursor: pointer;
+}
+.slot-swap:hover,
+.slot-close:hover {
+  color: var(--fg);
+  background-image: var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+.slot-swap:active,
+.slot-close:active {
+  background-image: var(--chrome-btn-active-img), var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+.slot-swap[hidden],
+.slot-close[hidden] { display: none; }
+.slot-body {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+#stream-park { display: none !important; }
+
+/* ---------------------------------------------------------- transcript */
+
+#transcript,
+#transcript-peek {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 4px 8px;
+  position: relative;
+  z-index: 1;
+  background-color: transparent;
+  background-image: var(--texture-transcript);
+  background-repeat: repeat;
+}
+#transcript-peek {
+  opacity: 0.92;
+}
+#jump-latest {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 4px 12px;
+  font: 12px/1.3 var(--mono);
+  color: var(--fg);
+  background-color: var(--bg-raised);
+  background-image: var(--chrome-btn-img);
+  background-size: var(--chrome-btn-size, 100% 100%);
+  background-repeat: var(--chrome-btn-repeat, no-repeat);
+  border: 1px solid var(--edge-btn);
+  border-image: var(--slice-btn);
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+#jump-latest:hover {
+  color: #fff;
+  border-color: var(--fg-dim);
+  background-image: var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+#jump-latest[hidden] { display: none; }
+
+.turn-user {
+  margin: 14px 0 6px auto;
+  max-width: 85%;
+  width: fit-content;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--edge);
+  border-radius: 10px 10px 2px 10px;
+  white-space: pre-wrap;
+  color: var(--fg);
+}
+.turn-user[data-kind="shell"] {
+  border-color: var(--code);
+  color: var(--code);
+}
+.turn-user[data-kind="shell"]::before {
+  content: "$ ";
+  opacity: 0.55;
+}
+.turn-user[data-kind="slash"] {
+  border-color: var(--warn);
+  color: var(--warn);
+  font-family: var(--mono);
+}
+.turn-user[data-kind="talk"] {
+  border-color: var(--mojo);
+}
+
+.answer {
+  margin: 6px 0;
+  padding: 2px 0;
+}
+.answer .chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+.answer[data-mode="chat"] .chip,
+.answer[data-mode="mojo"] .chip { color: var(--mojo); } /* mojo: legacy wire */
+.answer[data-mode="code"] .chip { color: var(--code); }
+
+.answer .md p { margin: 6px 0; }
+.answer .md pre {
+  background: var(--bg-raised);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  padding: 10px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.answer .md code {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--bg-raised);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+.answer .md pre code { background: none; padding: 0; }
+.answer .md h1, .answer .md h2, .answer .md h3 { margin: 12px 0 4px; }
+.answer .md blockquote {
+  margin: 6px 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--edge);
+  color: var(--fg-dim);
+}
+.answer .md a { color: var(--mojo); }
+.answer .md table { border-collapse: collapse; }
+.answer .md th, .answer .md td {
+  border: 1px solid var(--edge);
+  padding: 3px 8px;
+}
+
+.stream {
+  margin: 6px 0;
+  white-space: pre-wrap;
+  color: var(--fg);
+}
+.stream::after {
+  content: "▌";
+  color: var(--fg-dim);
+  animation: blink 1s step-start infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.interim { color: var(--fg-dim); }
+
+.meta { font-family: var(--mono); font-size: 12.5px; color: var(--fg-dim); margin: 3px 0; white-space: pre-wrap; }
+.meta[data-level="success"] { color: var(--code); }
+.meta[data-level="warn"] { color: var(--warn); }
+.meta[data-level="error"] { color: var(--error); }
+.meta[data-level="mode"] {
+  color: var(--warn);
+  border-left: 3px solid var(--warn);
+  padding: 6px 8px 6px 10px;
+  background: var(--bg-raised);
+  border-radius: 0 6px 6px 0;
+}
+.meta.prose { font-family: inherit; white-space: normal; }
+.meta.prose .md p { margin: 6px 0; }
+.meta.prose .md ul, .meta.prose .md ol { margin: 6px 0 6px 1.2em; }
+
+details.tool, details.shell {
+  margin: 4px 0;
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  background: var(--bg-raised);
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+details.tool > summary, details.shell > summary {
+  cursor: pointer;
+  padding: 4px 8px;
+  color: var(--fg-dim);
+  list-style: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+details.shell > summary {
+  color: var(--code);
+  font-weight: 600;
+}
+details.tool[data-error="1"] > summary { color: var(--error); }
+details.tool pre, details.shell pre {
+  margin: 0;
+  padding: 8px;
+  border-top: 1px solid var(--edge);
+  overflow-x: auto;
+  max-height: 320px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+details.shell .rc-bad { color: var(--error); }
+
+.fileout { margin: 8px 0; cursor: pointer; }
+.fileout img {
+  max-width: 100%;
+  max-height: 420px;
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  display: block;
+}
+.fileout .name { font-family: var(--mono); font-size: 12px; color: var(--fg); }
+.fileout-path {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-dim);
+  margin-top: 2px;
+  word-break: break-all;
+}
+.fileout-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.fileout-tools button {
+  font: 11px/1.2 inherit;
+  color: var(--fg);
+  background: var(--bg-input);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.fileout-tools button:hover { border-color: var(--mojo); }
+.fileout.selected { outline: 1px solid var(--mojo); }
+.fileout.focused { outline: 1px solid var(--code); }
+
+/* ------------------------------------------------------------- confirm */
+
+/* Network/bash gates often ship a multi-KB curl line. Keep the action
+   buttons visible (never flex-crushed off-screen) and scroll the prompt. */
+#confirmbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  margin: 4px 0;
+  border: 1px solid var(--warn);
+  border-radius: 8px;
+  background: var(--bg-raised);
+  max-width: 100%;
+}
+#confirmbar[hidden] { display: none; }
+#confirm-prompt {
+  flex: 1 1 12rem;
+  min-width: 0;
+  max-height: 9em;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: var(--fg);
+}
+#confirm-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+.confirm-keys {
+  font: 11px var(--mono);
+  color: var(--fg-dim);
+  margin-right: 4px;
+}
+#confirmbar button {
+  font: inherit;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--edge);
+  background-color: var(--bg-input);
+  background-image: var(--chrome-btn-img);
+  background-size: var(--chrome-btn-size, 100% 100%);
+  background-repeat: var(--chrome-btn-repeat, no-repeat);
+  border-image: var(--slice-btn);
+  color: var(--fg);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+#confirmbar button:hover {
+  background-image: var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+#confirmbar button:active {
+  background-image: var(--chrome-btn-active-img), var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+#confirm-approve { border-color: var(--code); }
+#confirm-deny { border-color: var(--error); }
+
+/* -------------------------------------------------------- quick-launch */
+
+/* Jobs / done flags. Pack doors live in Panels — not this strip. */
+#quickstrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 2px 0;
+  border-top: 1px solid var(--edge);
+  font: 11px var(--mono);
+}
+#quickstrip[hidden] { display: none; }
+
+.ql-btn {
+  background-color: var(--bg-raised);
+  background-image: var(--chrome-btn-img);
+  background-size: var(--chrome-btn-size, 100% 100%);
+  background-repeat: var(--chrome-btn-repeat, no-repeat);
+  border: 1px solid var(--edge);
+  border-image: var(--slice-btn);
+  border-radius: 999px;
+  color: var(--fg-dim);
+  font: inherit;
+  padding: 2px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ql-btn:hover {
+  color: var(--fg);
+  border-color: var(--fg-dim);
+  background-image: var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+.ql-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.ql-btn.flag { color: var(--fg); }
+.ql-btn.job-done { color: var(--code); }
+.ql-btn.job-clear { color: var(--fg-dim); }
+
+/* ----------------------------------------------------------- focus chip */
+
+/* Next-turn reference (F4 / Focus on a feed card). Not a rewind. */
+#focuschip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 6px 0;
+  font: 11px var(--mono);
+  color: var(--fg-dim);
+}
+#focuschip[hidden] { display: none; }
+.focus-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--mojo);
+  border-radius: 999px;
+  padding: 2px 8px 2px 10px;
+  color: var(--fg);
+  background: var(--bg-raised);
+}
+.focus-pill button {
+  border: none;
+  background: transparent;
+  color: var(--fg-dim);
+  cursor: pointer;
+  font: inherit;
+  padding: 0 2px;
+}
+.focus-pill button:hover { color: var(--fg); }
+
+/* ----------------------------------------------------------- F-key bar */
+
+#fkeybar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  align-items: center;
+  padding: 2px 8px;
+  border-top: 1px solid var(--edge);
+  font: 11px var(--mono);
+  color: var(--fg-dim);
+  background-color: var(--bg-raised);
+  background-image: var(--chrome-status-img);
+  background-size: var(--chrome-status-size, 100% 100%);
+  background-repeat: var(--chrome-status-repeat, no-repeat);
+}
+#fkeybar[hidden] { display: none; }
+.fkey {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 2px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fkey:hover { color: var(--fg); }
+.fkey kbd {
+  font: inherit;
+  font-weight: 700;
+  color: var(--fg);
+}
+.fkey-sep {
+  color: var(--edge);
+  padding: 0 2px;
+  user-select: none;
+}
+
+/* ----------------------------------------------------------- heartbeat */
+
+#heartbeat {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--code);
+  padding: 4px 8px 0;
+  border-top: 1px solid var(--edge);
+}
+#heartbeat[hidden] { display: none; }
+#hb-spin { min-width: 1.2em; }
+
+/* --------------------------------------------------------- completions */
+
+#msgqueue {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px 0;
+  border-top: 1px solid var(--edge);
+  background: var(--bg-raised);
+}
+#msgqueue[hidden] { display: none; }
+.q-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font: 12px/1.3 var(--mono);
+}
+.q-n { color: var(--fg-dim); flex: 0 0 auto; }
+.q-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg);
+}
+.q-btn {
+  flex: 0 0 auto;
+  font: 11px var(--mono);
+  color: var(--fg-dim);
+  background: transparent;
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  padding: 1px 6px;
+  cursor: pointer;
+}
+.q-btn:hover { color: var(--fg); border-color: var(--fg-dim); }
+
+#completions {
+  max-height: 220px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 0;
+  border: 1px solid var(--edge);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: var(--bg-raised);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+}
+#completions[hidden] { display: none; }
+
+.comp-item {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 4px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-dim);
+  cursor: pointer;
+}
+.comp-item .comp-name { color: var(--code); }
+.comp-item .comp-desc {
+  color: var(--fg-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.comp-item.hi,
+.comp-item:hover {
+  background: var(--bg-input);
+  color: var(--fg);
+}
+
+/* --------------------------------------------------------------- input */
+
+#inputbar {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding: 8px 0 4px;
+  border-top: 1px solid var(--edge);
+  background-color: transparent;
+  background-image: var(--chrome-inputbar-img);
+  background-size: var(--chrome-inputbar-size, 100% 100%);
+  background-repeat: var(--chrome-inputbar-repeat, no-repeat);
+}
+
+/* Talk/lab island switch + send/stop — same height, flip is the either/or. */
+#send, #stop {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 8px;
+  border: 1px solid var(--edge-btn);
+  background-color: var(--bg-input);
+  background-image: var(--chrome-btn-img);
+  background-size: var(--chrome-btn-size, 100% 100%);
+  background-repeat: var(--chrome-btn-repeat, no-repeat);
+  border-image: var(--slice-btn);
+  color: var(--fg);
+  cursor: pointer;
+  user-select: none;
+}
+#send:hover, #stop:hover {
+  border-color: var(--fg-dim);
+  background-color: var(--bg-raised);
+  background-image: var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+#send:active, #stop:active {
+  border-color: var(--fg);
+  background-image: var(--chrome-btn-active-img), var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+
+#flip {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  height: 40px;
+  padding: 1px 2px;
+  overflow: hidden;
+  border: 1px solid var(--edge-btn);
+  border-radius: 8px;
+  background-color: var(--bg-input);
+  background-image: var(--chrome-btn-img);
+  background-size: var(--chrome-btn-size, 100% 100%);
+  background-repeat: var(--chrome-btn-repeat, no-repeat);
+  border-image: var(--slice-flip);
+  color: var(--fg-dim);
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+#flip:hover {
+  background-color: var(--bg-raised);
+  border-color: var(--fg-dim);
+  background-image: var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+#flip:active {
+  background-image: var(--chrome-btn-active-img), var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+#flip .flip-name {
+  display: none;
+  width: 20px;
+  height: 20px;
+  color: var(--warn);
+}
+#flip .flip-name svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+#flip[data-overlay] .flip-name { display: block; }
+#flip[data-overlay] .flip-pair { display: none; }
+#flip[data-overlay="cursor"] .flip-name { color: #7c9eff; }
+#flip[data-overlay="claude"] .flip-name { color: #d97757; }
+#flip[data-overlay="grok"] .flip-name { color: #b18aff; }
+#flip[data-overlay="codex"] .flip-name { color: #19c37d; }
+#flip .flip-pair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+#flip .flip-mark {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  pointer-events: none;
+}
+/* Mark is inked for black. Keep the chip dark on the light skin. */
+html[data-skin="light"] #flip:not([data-overlay]) {
+  background-color: #16161c;
+  border-color: #2a2a33;
+}
+
+#input {
+  flex: 1;
+  resize: none;
+  max-height: 180px;
+  min-height: 40px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--edge);
+  background-color: var(--bg-input);
+  background-image: var(--chrome-input-img);
+  background-size: var(--chrome-input-size, 100% 100%);
+  background-repeat: var(--chrome-input-repeat, no-repeat);
+  color: var(--fg);
+  font: inherit;
+  line-height: 1.45;
+  outline: none;
+}
+#input:focus { border-color: var(--fg-dim); }
+#input:disabled { opacity: 0.55; }
+
+#stop { border-color: var(--error); color: var(--error); }
+#stop:hover { border-color: var(--error); color: var(--error); }
+
+#shell.dragging #inputbar { outline: 2px dashed var(--fg-dim); outline-offset: 4px; }
+
+/* -------------------------------------------------------------- status */
+
+#statusbar {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-dim);
+  padding: 2px 2px 8px;
+  background-color: transparent;
+  background-image: var(--chrome-status-img);
+  background-size: var(--chrome-status-size, 100% 100%);
+  background-repeat: var(--chrome-status-repeat, no-repeat);
+}
+#mode-chip[data-color="magenta"] { color: var(--mojo); }
+#mode-chip[data-color="green"] { color: var(--code); }
+#mode-chip[data-color="yellow"] { color: var(--warn); }
+#mode-chip[data-color="red"], #mode-chip[data-color="orange"] { color: var(--error); }
+/* Exclusive modes (plan/rail/…) — glanceable; flip still means posture only */
+#mode-chip.mode-exclusive {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 8px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  color: var(--warn);
+}
+#mode-chip.mode-exclusive[data-color="cyan"],
+#mode-chip.mode-exclusive[data-color="blue"] { color: #6ec8ff; }
+#mode-chip.mode-exclusive[data-color="magenta"] { color: var(--mojo); }
+#mode-chip.mode-exclusive[data-color="green"] { color: var(--code); }
+#mode-chip.mode-exclusive[data-color="red"],
+#mode-chip.mode-exclusive[data-color="orange"] { color: var(--error); }
+#exit-hint { margin-left: auto; }
+#statusbar #hud-usage {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+#statusbar #hud-usage[hidden] { display: none; }
+#hud-meter, #hud-session { color: var(--fg-dim); }
+#hud-meter[hidden], #hud-session[hidden] { display: none; }
+#conn[data-state="open"] { color: var(--code); }
+#conn[data-state="closed"], #conn[data-state="connecting"] { color: var(--warn); }
+
+/* ---------------------------------------------------------- feed view cards */
+
+/* Pane "View" lands here — larger reading surface than the side dock.
+   Magenta ring only when Focus-pinned for the next turn. */
+.feed-view {
+  margin: 14px 0;
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  overflow: hidden;
+  outline: none;
+}
+.feed-view-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: baseline;
+  padding: 8px 12px 4px;
+  font: 12px var(--mono);
+  border-bottom: 1px solid var(--edge);
+}
+.feed-view-kind {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mojo);
+  font-size: 10px;
+}
+.feed-view-title {
+  color: var(--fg);
+  font-weight: 600;
+}
+.feed-view-addr {
+  color: var(--fg-dim);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.feed-view-body {
+  margin: 0;
+  padding: 10px 12px;
+  max-height: min(60vh, 520px);
+  overflow: auto;
+  font: 12.5px/1.45 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--fg);
+  user-select: text;
+}
+.feed-view-body.prose {
+  font-family: inherit;
+  white-space: normal;
+}
+.feed-view-body.prose .md ul { margin: 6px 0 6px 1.2em; padding: 0; }
+.feed-view-body.prose .md li { margin: 6px 0; }
+.feed-view-body.prose .md a { color: var(--mojo); }
+.feed-view-body.prose .md h3 { margin: 0 0 8px; font-size: 14px; }
+.feed-view.collapsed .feed-view-body,
+.feed-view.collapsed .feed-view-note {
+  display: none;
+}
+.feed-view.collapsed .feed-view-head {
+  border-bottom: none;
+}
+.feed-view-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 6px;
+  background: var(--bg-input);
+}
+.feed-view-bar.top { border-bottom: 1px solid var(--edge); }
+.feed-view-bar.bottom { border-top: 1px solid var(--edge); }
+.feed-view-collapse {
+  border: none;
+  background: transparent;
+  color: var(--fg-dim);
+  font: 11px var(--mono);
+  padding: 4px 6px;
+  cursor: pointer;
+  text-align: left;
+}
+.feed-view-collapse:hover { color: var(--fg); }
+.feed-view-tools {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.feed-view-focus,
+.feed-view-copy {
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  background: var(--bg-raised);
+  color: var(--fg);
+  font: 11px var(--mono);
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.feed-view-focus:hover { border-color: var(--mojo); }
+.feed-view-copy:hover { border-color: var(--fg-dim); }
+.feed-view.focused {
+  border-color: var(--mojo);
+  box-shadow: 0 0 0 1px var(--mojo);
+}
+.feed-view-note {
+  padding: 4px 12px 8px;
+  font: 11px var(--mono);
+  color: var(--warn);
+}
+.feed-view-img {
+  display: block;
+  max-width: 100%;
+  max-height: min(50vh, 420px);
+  margin: 8px 12px;
+  object-fit: contain;
+}
+
+/* ---------------------------------------------------------- side pane dock */
+
+/* Side panel sits *beside the transcript only* — same vertical band as the
+   chat history, above the input. Completions may still float over the prompt;
+   the input bar itself never resizes when a panel opens. */
+.slot-body #panedeck,
+#pane-host-a {
+  flex: 1;
+  width: auto;
+  max-width: none;
+  min-width: 0;
+  box-shadow: none;
+  border: none;
+}
+#workspace.stream-dock .slot[data-view]:not([data-view="stream"]) {
+  border-left: 1px solid var(--edge);
+  background-color: var(--bg-raised);
+  background-image: var(--chrome-pane-img);
+  background-size: var(--chrome-pane-size, 100% 100%);
+  background-repeat: var(--chrome-pane-repeat, no-repeat);
+  border-image: var(--slice-dock);
+}
+html[data-pane-side="left"] #workspace.stream-dock .slot[data-view]:not([data-view="stream"]) {
+  border-left: none;
+  border-right: 1px solid var(--edge);
+}
+#workspace.stream-dock.html-place .slot[data-view="stream"] {
+  border-left: 1px solid var(--edge);
+  background: var(--bg-raised);
+}
+#workspace.stream-dock.html-place .slot[data-view]:not([data-view="stream"]) {
+  border-left: none;
+  background: transparent;
+}
+html[data-pane-side="left"] #workspace.stream-dock.html-place .slot[data-view="stream"] {
+  border-left: none;
+  border-right: 1px solid var(--edge);
+}
+html[data-pane-side="left"] #workspace.stream-dock.html-place .slot[data-view]:not([data-view="stream"]) {
+  border-right: none;
+}
+#pane-host-a {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-image: var(--chrome-pane-img);
+  background-size: var(--chrome-pane-size, 100% 100%);
+  background-repeat: var(--chrome-pane-repeat, no-repeat);
+  border-image: var(--slice-pane);
+}
+#pane-host-a[hidden] { display: none !important; }
+#pane-host-a .pane-title {
+  font: 11px var(--mono);
+  color: var(--fg-dim);
+  padding: 8px 12px 4px;
+}
+#pane-host-a .pane-rows {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  font: 13px/1.4 var(--mono);
+}
+#pane-host-a .pane-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 8px;
+}
+
+#panedeck {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-left: 1px solid var(--edge);
+  background-color: var(--bg-raised);
+  background-image: var(--chrome-pane-img);
+  background-size: var(--chrome-pane-size, 100% 100%);
+  background-repeat: var(--chrome-pane-repeat, no-repeat);
+  border-image: var(--slice-dock);
+  box-shadow: -6px 0 18px rgba(0, 0, 0, 0.25);
+}
+
+html[data-pane-side="right"] #workspace,
+#workspace[data-pane-side="right"] { flex-direction: row; }
+html[data-pane-side="left"] #workspace,
+#workspace[data-pane-side="left"] { flex-direction: row-reverse; }
+html[data-pane-side="left"] #panedeck {
+  border-left: none;
+  border-right: 1px solid var(--edge);
+  box-shadow: 6px 0 18px rgba(0, 0, 0, 0.25);
+}
+html[data-pane-side="right"] #panedeck {
+  border-right: none;
+  border-left: 1px solid var(--edge);
+  box-shadow: -6px 0 18px rgba(0, 0, 0, 0.25);
+}
+#panedeck[hidden] { display: none; }
+
+/* Center gutter between the two slots. Follows the cursor; same in both sides. */
+#pane-resize {
+  position: relative;
+  flex: 0 0 6px;
+  width: 6px;
+  align-self: stretch;
+  cursor: col-resize;
+  z-index: 5;
+  background: transparent;
+}
+#pane-resize::after {
+  content: "";
+  position: absolute;
+  inset: 0 -4px;
+}
+#workspace.solo #pane-resize,
+#pane-resize[hidden] { display: none; }
+#pane-resize:hover,
+#pane-resize.dragging {
+  background: color-mix(in srgb, var(--mojo) 35%, transparent);
+}
+body.pane-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* M1.2: tab ribbon retired — Panels menu is discovery. Keep node for tests/DOM. */
+#panetabs {
+  display: none !important;
+}
+
+.pane-tab {
+  background: none;
+  border: 1px solid var(--edge);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  color: var(--fg-dim);
+  font: 12px var(--mono);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.pane-tab:hover { color: var(--fg); }
+.pane-tab.open {
+  color: var(--fg);
+  background: var(--bg-input);
+  border-color: var(--fg-dim);
+}
+
+#panepanel {
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-top: none;
+}
+
+/* The author display:flex above beats the UA [hidden] rule, so without this
+   guard close() (Esc / ✕ / Panels → Close panel) flips state but the panel
+   never visually hides — same trap #confirmbar[hidden] already guards. */
+#panepanel[hidden] { display: none; }
+
+#pane-title {
+  font: 11px var(--mono);
+  color: var(--fg-dim);
+  padding: 8px 12px 4px;
+  padding-right: 36px; /* room for the close affordance */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#pane-rows {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: 2px 0;
+  font: 13px/1.4 var(--mono);
+}
+
+.pane-row {
+  padding: 1px 12px;
+  cursor: pointer;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pane-row[data-kind="line"] {
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-overflow: clip;
+  overflow: visible;
+}
+.pane-page-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 6px 12px 10px;
+  background: #fff;
+  border: 1px solid var(--edge);
+}
+.pane-canvas .pane-page-img {
+  width: calc(100% - 24px);
+  max-height: min(72vh, 100%);
+  object-fit: contain;
+}
+
+.pane-row:hover { background: var(--bg-input); }
+.pane-row.selected { background: var(--bg-input); color: #fff; }
+.pane-k { color: var(--fg-dim); }
+.pane-dot { color: var(--fg-dim); opacity: 0.75; }
+.pane-v { color: var(--fg); }
+.pane-row:has(.pane-choice) {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: visible;
+}
+.pane-choice {
+  font: 12px/1.3 inherit;
+  color: var(--fg);
+  background: var(--bg-input);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  padding: 2px 6px;
+  max-width: min(16rem, 70%);
+  cursor: pointer;
+}
+.pane-choice:focus { outline: 1px solid var(--mojo); }
+.pane-row.selected .pane-k { color: color-mix(in srgb, var(--fg) 62%, var(--fg-dim)); }
+.pane-row.selected .pane-v { color: #fff; }
+.pane-row.accent .pane-v { color: var(--code); }
+.pane-row.accent { color: var(--code); }
+/* TUI paints ● on accent; Face only recolored until now. Folder desks in
+   Files (scratch → ~) use accent on containers — same green dot. Leaves
+   that already bake ●/○ into the label (plugins) stay color-only. */
+.pane-row.accent[data-kind="container"]::before {
+  content: "● ";
+  color: var(--code);
+}
+.pane-row.empty { color: var(--fg-dim); cursor: default; }
+.pane-row[data-kind="caption"] {
+  color: var(--fg-dim);
+  cursor: default;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  margin-top: 8px;
+  padding-top: 6px;
+}
+.pane-row.tone-empty {
+  color: var(--fg-dim);
+  opacity: 0.55;
+  cursor: default;
+}
+.slot-pick option:disabled { color: var(--fg-dim); }
+.pane-row.tone-added, .pane-row.tone-untracked { color: var(--code); }
+.pane-row.tone-modified, .pane-row.tone-renamed { color: var(--warn); }
+.pane-row.tone-removed { color: var(--error); }
+
+.slot-html {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+iframe.slot-html-frame {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  color-scheme: dark;
+}
+html[data-skin="light"] iframe.slot-html-frame {
+  color-scheme: light;
+}
+#panepanel:has(.slot-html) #pane-title,
+#pane-host-a:has(.slot-html) .pane-title {
+  display: none;
+}
+#pane-rows.slot-html,
+#pane-host-a .pane-rows.slot-html {
+  overflow: hidden;
+}
+
+.maker-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px 14px;
+  font: 13px/1.4 system-ui, sans-serif;
+}
+.maker-lead {
+  margin: 0;
+  color: var(--fg-dim);
+  font-size: 12px;
+}
+.maker-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.maker-lab {
+  color: var(--fg-dim);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+.maker-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--fg);
+  font: 13px/1.3 inherit;
+}
+.maker-input:focus {
+  outline: none;
+  border-color: var(--fg-dim);
+}
+.maker-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg);
+  font-size: 13px;
+}
+.maker-extras { display: flex; flex-direction: column; gap: 10px; }
+.maker-go { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.maker-btn {
+  padding: 7px 10px;
+  border: 1px solid var(--edge-btn);
+  border-radius: 6px;
+  background: var(--bg-raised);
+  color: var(--fg);
+  cursor: pointer;
+  font: 13px inherit;
+}
+.maker-btn:hover { border-color: var(--fg-dim); }
+
+#pane-actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--edge);
+  flex-wrap: wrap;
+}
+
+.pane-action {
+  background-color: var(--bg-input);
+  background-image: var(--chrome-btn-img);
+  background-size: var(--chrome-btn-size, 100% 100%);
+  background-repeat: var(--chrome-btn-repeat, no-repeat);
+  border: 1px solid var(--edge);
+  border-image: var(--slice-btn);
+  border-radius: 6px;
+  color: var(--fg);
+  font: 12px var(--mono);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.pane-action:hover {
+  border-color: var(--fg-dim);
+  background-image: var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+.pane-action:active {
+  background-image: var(--chrome-btn-active-img), var(--chrome-btn-hover-img), var(--chrome-btn-img);
+}
+.pane-action.nav { color: var(--fg-dim); margin-left: auto; }
+
+/* ---------------------------------------------------------- menu bar */
+
+#menubar {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  padding: 6px 0 4px;
+  border-bottom: 1px solid var(--edge);
+  background-image: var(--chrome-menubar-img);
+  background-size: var(--chrome-menubar-size, 100% 100%);
+  background-repeat: var(--chrome-menubar-repeat, no-repeat);
+  border-image: var(--slice-menubar);
+  font: 13px var(--font-mono);
+  user-select: none; /* it's the title bar under Tauri — no text-select on drag */
+}
+html.tauri-host #menubar { cursor: grab; }
+html.tauri-host #menubar button,
+html.tauri-host #menubar .menu-drop { cursor: pointer; }
+
+/* Desk: titles participate in #menubar flex (no extra box). Phone overrides. */
+.menu-strip { display: contents; }
+
+.menu-title {
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--fg-dim);
+  font: inherit;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+.menu-title:hover { color: var(--fg); }
+.menu-title.open { color: var(--fg); background: var(--bg-raised); }
+
+/* Stamp sits at the right of the menu row. Tauri window buttons follow it. */
+.menu-version {
+  margin-left: auto;
+  padding: 2px 10px;
+  color: var(--fg-dim);
+  font: 11px var(--mono);
+  letter-spacing: 0.02em;
+}
+
+/* Tauri-only window controls (created by menubar.js only when __TAURI__
+   exists) — the chrome-less window's min/max/close, parked at the bar's
+   right end like the native title bar had them. */
+.win-controls { display: flex; gap: 2px; }
+.win-btn {
+  background-color: transparent;
+  background-image: var(--chrome-win-img);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  min-width: 22px;
+}
+.win-btn:hover {
+  color: var(--fg);
+  background-color: var(--bg-raised);
+  background-image: var(--chrome-btn-hover-img), var(--chrome-win-img);
+}
+.win-btn[title="close"] {
+  background-image: var(--chrome-win-close-img), var(--chrome-win-img);
+}
+.win-btn[title="close"]:hover {
+  color: var(--error);
+  background-image: var(--chrome-win-close-img), var(--chrome-win-img);
+}
+
+.menu-drop {
+  position: absolute;
+  top: 100%;
+  z-index: 30;
+  min-width: 196px;
+  max-width: min(280px, calc(100vw - 16px));
+  /* Tall menus scroll; rows must not shrink to fit the cap (that bunched labels). */
+  max-height: min(80vh, calc(100vh - 4rem));
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 1px;
+  padding: 4px;
+  background: var(--bg-raised);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+.menu-item {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: none;
+  border: none;
+  border-radius: 5px;
+  color: var(--fg);
+  font: 12.5px/1.35 var(--mono);
+  text-align: left;
+  padding: 6px 10px;
+  min-height: 1.75em;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
+}
+.menu-item > span:first-child {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.menu-item:hover:not(:disabled) { background: var(--bg-input); }
+.menu-item:disabled { color: var(--fg-dim); cursor: default; }
+.menu-item .hint {
+  flex: 0 0 auto;
+  color: var(--fg-dim);
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.menu-item.caption {
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+
+#about-card {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+#about-card[hidden] { display: none; }
+.about-card {
+  position: relative;
+  width: min(280px, calc(100vw - 32px));
+  padding: 22px 20px 16px;
+  background: var(--bg-raised);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+.about-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--fg-dim);
+  font: 13px var(--mono);
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.about-close:hover { color: var(--fg); }
+.about-product {
+  font: 15px var(--mono);
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+.about-credit {
+  color: var(--fg-dim);
+  font: 13px var(--mono);
+  margin-bottom: 10px;
+}
+.about-version {
+  font: 13px var(--mono);
+  color: var(--code);
+  margin-bottom: 4px;
+}
+.about-facts {
+  color: var(--fg-dim);
+  font: 12px/1.45 var(--mono);
+  margin-bottom: 8px;
+}
+.about-facts div { margin: 0; }
+.about-signs {
+  color: var(--mojo);
+  font: italic 13px/1.4 inherit;
+  margin-bottom: 10px;
+}
+.about-line {
+  color: var(--fg);
+  font: italic 13.5px/1.4 inherit;
+  min-height: 2.8em;
+  margin-bottom: 14px;
+}
+.about-next {
+  background: none;
+  border: 1px solid var(--edge-btn);
+  border-radius: 6px;
+  color: var(--fg-dim);
+  font: 12px var(--mono);
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.about-next:hover { color: var(--fg); border-color: var(--fg-dim); }
+
+/* ---------------------------------------------------------- HUD rail (F1)
+
+   Lives on the live stream's slot-chrome (same line as the folder name).
+   Parks in #hud-park only when no stream slot is showing. */
+
+#hud-park:empty { display: none; }
+
+#hud {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  font: 11px var(--mono);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#hud-park #hud {
+  padding: 2px 2px 4px;
+  border-bottom: 1px solid var(--edge);
+}
+.slot-chrome #hud {
+  flex: 1 1 auto;
+}
+
+/* Same [hidden]-vs-display trap as #panepanel: without this the empty rail
+   shows before the first chrome_state unhides it. */
+#hud[hidden] { display: none; }
+
+.hud-chip {
+  color: var(--fg-dim);
+  border: 1px solid var(--edge);
+  border-radius: 999px;
+  padding: 0 6px;
+  line-height: 1.6;
+  white-space: nowrap;
+  background: var(--bg);
+}
+
+#hud-model:empty,
+#hud-project:empty,
+#hud-persona:empty { display: none; }
+#hud-model { color: var(--fg); }
+#hud-cwd { color: var(--fg); }
+#hud-cwd[hidden] { display: none; }
+#hud-persona { color: var(--mojo); }
+#hud-persona[hidden] { display: none; }
+#hud-journal { color: var(--code); }
+#hud-journal[hidden] { display: none; }
+#hud-trust, #hud-tier {
+  cursor: pointer;
+  font: inherit;
+}
+#hud-trust[data-trust="safe"] { color: var(--fg-dim); }
+#hud-trust[data-trust="yolo"] { color: var(--warn, #c9a227); }
+#hud-trust[data-trust="freeball"] { color: var(--error, #c44); }
+#hud-tier { color: var(--fg); }
+#hud-tier[hidden] { display: none; }
+#hud-browser {
+  color: var(--code);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  padding: 0 0.4em;
+}
+#hud-browser[hidden] { display: none; }
+#hud-browser[data-mode="hidden"] { color: var(--warn, #c9a227); }
+/* Folder/cwd already live in slot-here on the live stream line. */
+.slot-chrome #hud-project,
+.slot-chrome #hud-cwd { display: none; }
+/* Surface chip retired — talk/lab is the flip, not a third door. */
+#hud-surface[hidden] { display: none; }
+
+/* side dock polish */
+
+.pane-tab {
+  letter-spacing: 0.4px;
+  transition: color 80ms ease, background 80ms ease;
+}
+
+.pane-tab.open {
+  color: #fff;
+  background: var(--bg-input);
+  border-color: var(--fg-dim);
+  box-shadow: inset 0 -2px 0 var(--mojo);
+}
+
+.pane-row {
+  border-left: 2px solid transparent;
+}
+
+.pane-row.selected {
+  background: var(--bg-input);
+  color: #fff;
+  border-left-color: var(--mojo);
+}
+
+.pane-action {
+  transition: border-color 80ms ease, color 80ms ease;
+}
+
+.pane-action:hover {
+  border-color: var(--mojo);
+  color: #fff;
+}
+
+/* panel close affordance (F3 polish) */
+
+.pane-close {
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  background: none;
+  border: none;
+  color: var(--fg-dim);
+  font: 13px var(--mono);
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.pane-close:hover { color: #fff; }
+
+#panepanel { position: relative; }
+
+/* Occupancy glass — overlay eats input. */
+#glass {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+}
+#glass[hidden] { display: none; }
+#glass[data-mode="black"] {
+  background: #050508;
+}
+#glass[data-mode="away"] {
+  background: color-mix(in srgb, var(--bg) 45%, transparent);
+  align-items: flex-end;
+  padding-bottom: 5.5rem;
+}
+.glass-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--edge);
+  color: var(--fg);
+  padding: 1.25rem 1.5rem;
+  min-width: 16rem;
+  max-width: 22rem;
+  font: 13px var(--mono);
+}
+#glass-title {
+  font-size: 14px;
+  margin-bottom: 0.4rem;
+}
+#glass-copy {
+  color: var(--fg-dim);
+  margin: 0 0 0.8rem;
+}
+#glass-code {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.7rem;
+  background: var(--bg-input);
+  border: 1px solid var(--edge-btn);
+  color: var(--fg);
+  font: 13px var(--mono);
+  padding: 0.4rem 0.5rem;
+}
+#glass-code[hidden] { display: none; }
+.glass-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+.glass-actions button {
+  background: var(--bg-input);
+  border: 1px solid var(--edge-btn);
+  color: var(--fg);
+  font: 12px var(--mono);
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+html[data-glass="locked"] #inputbar,
+html[data-glass="black"] #inputbar,
+html[data-glass="away"] #inputbar {
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* Options → Bold type: one weight for the whole glass, like a terminal bold font.
+   Overrides the many `font:` shorthands that reset weight to normal. */
+html[data-bold="1"],
+html[data-bold="1"] * {
+  font-weight: 700 !important;
+}
+
+/* ---------------------------------------------------------- phone glass (G3)
+
+   All rules are gated on html[data-view="phone"] so the desk (no attribute)
+   stays byte-identical. First paint is fullscreen: 100dvh, dual split
+   (stream + bookmarks). Menubar stays (folded, no window chrome). Portrait
+   stacks the two slots; landscape (≥720px) puts them side by side. */
+
+#thumbbar { display: none; }
+
+html[data-view="phone"],
+html[data-view="phone"] body {
+  height: var(--vvh, 100dvh);
+  max-height: var(--vvh, 100dvh);
+  overflow: hidden;
+  overscroll-behavior: none;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+html[data-view="phone"] #shell {
+  height: var(--vvh, 100dvh);
+  max-height: var(--vvh, 100dvh);
+  margin-top: var(--vvt, 0px);
+  /* Top safe-area rides on #menubar only — avoids a dead band under the status bar. */
+  padding: 0 env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px);
+  box-sizing: border-box;
+}
+html[data-view="phone"] #hud-park {
+  display: none !important;
+}
+html[data-view="phone"] #thumbbar {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  padding: 6px 8px 0;
+  flex: 0 0 auto;
+}
+html[data-view="phone"] #thumbbar[hidden] { display: flex; }
+html[data-view="phone"] #thumbbar button {
+  flex: 1;
+  min-height: 40px;
+  font: 13px var(--mono);
+  color: var(--fg);
+  background-color: var(--bg-input);
+  background-image: var(--chrome-btn-img);
+  background-size: var(--chrome-btn-size, 100% 100%);
+  background-repeat: var(--chrome-btn-repeat, no-repeat);
+  border: 1px solid var(--edge-btn);
+  border-image: var(--slice-btn);
+  border-radius: 8px;
+  cursor: pointer;
+}
+#input-actions { display: contents; }
+html[data-view="phone"] #inputbar {
+  flex: 0 0 auto;
+  align-items: stretch;
+  padding: 4px 8px 4px;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), env(keyboard-inset-bottom, 0px));
+}
+html[data-view="phone"] #input-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+}
+html[data-view="phone"] #voice {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  font: 12px var(--mono);
+  color: var(--fg);
+  background: var(--bg-input);
+  border: 1px solid var(--edge-btn);
+  border-radius: 8px;
+  cursor: pointer;
+}
+html[data-view="phone"] #input-actions #stop,
+html[data-view="phone"] #input-actions #send {
+  min-width: 40px;
+  height: 40px;
+}
+html[data-view="phone"] #voice[data-listen="1"] {
+  color: var(--error);
+}
+html[data-view="phone"][data-compose="1"] #input {
+  min-height: 4.5em;
+}
+html[data-view="phone"] #flip,
+html[data-view="phone"] #fkeybar,
+html[data-view="phone"] #hud,
+html[data-view="phone"] #hud-park,
+html[data-view="phone"] .win-controls,
+html[data-view="phone"] #menubar .menu-version,
+html[data-view="phone"] #glass,
+html[data-view="phone"] #glass-lock,
+html[data-view="phone"] #glass-unlock {
+  display: none !important;
+}
+html[data-view="phone"] #menubar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  padding: env(safe-area-inset-top, 0px) 0 0;
+  margin: 0;
+  cursor: default;
+  flex: 0 0 auto;
+  /* Overflow stays visible so .menu-drop is not clipped. Titles scroll in .menu-strip. */
+  overflow: visible;
+  z-index: 40;
+  /* Desk titlebar padding (6px 0 4px) must not leak on phone. */
+  border-bottom: 1px solid var(--edge);
+}
+html[data-view="phone"] #menubar .menu-strip {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+html[data-view="phone"] #menubar .menu-strip::-webkit-scrollbar { display: none; }
+html[data-view="phone"] #menubar .menu-title {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  padding: 2px 6px;
+  min-height: 28px;
+  line-height: 1.2;
+  font-size: 11px;
+  white-space: nowrap;
+}
+html[data-view="phone"] #workspace {
+  flex: 1 1 0;
+  flex-direction: column !important;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+html[data-view="phone"] #transcript,
+html[data-view="phone"] #transcript-peek {
+  padding: 8px 4px 4px;
+  scroll-padding-bottom: 2.75rem;
+  padding-bottom: 2.5rem;
+}
+html[data-view="phone"] #thumbbar {
+  padding: 4px 8px 0;
+}
+html[data-view="phone"] #thumbbar button {
+  min-height: 36px;
+}
+html[data-view="phone"] #statusbar {
+  padding: 0 8px 4px;
+}
+/* Pane label lives in the pick control — give the path the rest of the bar. */
+html[data-view="phone"] .slot-here-kind { display: none; }
+html[data-view="phone"] .slot-here-loc {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--fg);
+}
+html[data-view="phone"] .slot-pick {
+  width: auto;
+  min-width: 4.25rem;
+  max-width: 26%;
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 2px 14px 2px 5px;
+}
+html[data-view="phone"] #jump-latest {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--phone-bottom-chrome, 10.5rem) + 6px);
+  z-index: 25;
+}
+html[data-view="phone"][data-compose="1"] #jump-latest {
+  bottom: calc(var(--phone-bottom-chrome, 10.5rem) + 10px);
+}
+html[data-view="phone"][data-compose="1"] #thumbbar {
+  padding-top: 2px;
+}
+html[data-view="phone"][data-compose="1"] #inputbar {
+  padding-top: 8px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.35);
+  background-color: var(--bg);
+}
+html[data-view="phone"] #pane-resize { display: none !important; }
+html[data-view="phone"] #workspace:not(.solo) #slot-a,
+html[data-view="phone"] #workspace:not(.solo)[data-pane-side] #slot-a,
+html[data-view="phone"] #workspace:not(.solo) #slot-b,
+html[data-view="phone"] #workspace:not(.solo)[data-pane-side] #slot-b {
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+html[data-view="phone"] #workspace:not(.solo) #slot-b,
+html[data-view="phone"] #workspace:not(.solo)[data-pane-side] #slot-b {
+  border-left: none !important;
+  border-right: none !important;
+  border-top: 1px solid var(--edge);
+  order: 3;
+}
+html[data-view="phone"] #panedeck {
+  box-shadow: none;
+  border-left: none;
+  border-right: none;
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+}
+html[data-view="phone"] .slot-chrome {
+  padding: 2px 6px;
+  min-height: 0;
+}
+
+@media (min-width: 720px) {
+  html[data-view="phone"] #workspace {
+    flex-direction: row !important;
+  }
+  html[data-view="phone"] #workspace:not(.solo) #slot-a,
+  html[data-view="phone"] #workspace:not(.solo)[data-pane-side] #slot-a,
+  html[data-view="phone"] #workspace:not(.solo) #slot-b,
+  html[data-view="phone"] #workspace:not(.solo)[data-pane-side] #slot-b {
+    width: auto !important;
+    order: 0;
+    border-top: none !important;
+  }
+  html[data-view="phone"] #workspace:not(.solo) #slot-b,
+  html[data-view="phone"] #workspace:not(.solo)[data-pane-side] #slot-b {
+    border-left: 1px solid var(--edge) !important;
+  }
+}

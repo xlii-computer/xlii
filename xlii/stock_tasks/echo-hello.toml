@@ -1,0 +1,8 @@
+name = "echo-hello"
+description = "Tiny linear demo — no network, no writes"
+
+[[step]]
+run = "printf 'hello from stock tasks\\n'"
+
+[[step]]
+ask = "Reply with exactly: stock pipeline ok"

@@ -1,0 +1,25 @@
+name = "coingecko-search"
+version = 1
+summary = "Cryptocurrency prices, market data, OHLCV charts — 13,000+ coins (argus: coingecko.search)"
+category = "finance"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://api.coingecko.com/api/v3/search"
+
+[request.params]
+query = "{query}"
+
+[quota]
+daily = 500
+
+[shape]
+records = "coins"
+
+[shape.fields]
+symbol = "symbol"
+name = "name"
+cgId = "id"
+marketCapRank = "market_cap_rank"
+thumb = "thumb"

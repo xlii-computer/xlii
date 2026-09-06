@@ -1,0 +1,95 @@
+name: Security Scans (Trivy · Gitleaks · Semgrep)
+
+# Free SAST / secret / vuln scanning — no GitHub Advanced Security required.
+# Each tool FAILS THE BUILD on findings (gates PRs + visible in the Actions log)
+# and uploads a downloadable report artifact. Nothing is pushed to GitHub's paid
+# Code scanning tab, and no source leaves the runner.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "0 3 * * 1" # weekly, Monday 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read # least privilege — no security-events:write needed without GHAS
+
+concurrency:
+  group: security-scans-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  trivy:
+    name: Trivy (filesystem + deps)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Run Trivy (fails on CRITICAL/HIGH)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "table" # human-readable in the job log
+          severity: "CRITICAL,HIGH"
+          ignore-unfixed: true # only flag vulns that actually have a fix
+          exit-code: "1" # <-- gates the build; no SARIF/GHAS needed
+
+  gitleaks:
+    name: Gitleaks (secrets, full history)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks via Docker (no org license required)
+        run: |
+          docker run --rm \
+            -v "$(pwd):/repo" \
+            ghcr.io/gitleaks/gitleaks:latest \
+            detect \
+              --source=/repo \
+              --config=/repo/.gitleaks.toml \
+              --redact -v \
+              --report-format=sarif \
+              --report-path=/repo/gitleaks.sarif \
+              --exit-code=1
+
+      - name: Upload Gitleaks report
+        if: always() # upload even when the scan fails the build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: gitleaks-report
+          path: gitleaks.sarif
+          if-no-files-found: ignore
+
+  semgrep:
+    name: Semgrep (SAST)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest # rebranded from the old returntocorp/semgrep
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Run Semgrep (registry rules, telemetry off)
+        run: |
+          semgrep scan \
+            --config=p/ci \
+            --metrics=off \
+            --sarif --output=semgrep.sarif \
+            --error
+
+      - name: Upload Semgrep report
+        if: always() # upload even when the scan fails the build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: semgrep-report
+          path: semgrep.sarif
+          if-no-files-found: ignore

@@ -1,0 +1,12 @@
+name = "notes-from-diff"
+description = "Meeting notes from the working-tree diff (param: base, default HEAD)"
+
+[params.base]
+default = "HEAD"
+help = "git ref to diff against"
+
+[[step]]
+run = "git diff {{base}}"
+
+[[step]]
+ask = """Turn the diff above into concise meeting notes: what changed, why it might matter, and any risks or follow-ups. Use short bullets."""

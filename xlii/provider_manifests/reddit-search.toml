@@ -1,0 +1,36 @@
+name = "reddit-search"
+version = 1
+summary = "Reddit search — posts across all subreddits (argus: reddit, hand-authored cohort 2)"
+category = "social"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://www.reddit.com/search.json"
+
+[request.params]
+q = "{query}"
+sort = "{sort}"
+limit = "{limit}"
+t = "{time}"
+
+[request.headers]
+User-Agent = "xlii/1.0 (research workbench)"
+
+[defaults]
+sort = "relevance"
+limit = "25"
+time = "all"
+
+[shape]
+records = "data.children"
+
+[shape.fields]
+title = "data.title"
+subreddit = "data.subreddit"
+author = "data.author"
+score = "data.score"
+numComments = "data.num_comments"
+url = "data.url"
+permalink = "data.permalink"
+created = "data.created_utc"

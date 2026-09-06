@@ -1,0 +1,36 @@
+name = "guardian"
+version = 1
+summary = "The Guardian Open Platform — UK and world news, full-text search with rich fields (argus: guardian.query)"
+category = "intel"
+required_params = [ "query"]
+
+[defaults]
+limit = "25"
+
+[request]
+method = "GET"
+url = "https://content.guardianapis.com/search"
+
+[request.params]
+q = "{query}"
+page-size = "{limit}"
+show-fields = "headline,trailText,byline,thumbnail,body"
+order-by = "newest"
+
+[auth]
+kind = "query"
+key_env = "GUARDIAN_API_KEY"
+param = "api-key"
+required = true
+
+[quota]
+daily = 5000
+
+[shape]
+records = "response.results"
+
+[shape.fields]
+sectionName = "sectionName"
+publishedAt = "webPublicationDate"
+url = "webUrl"
+sourceUrl = "webUrl"

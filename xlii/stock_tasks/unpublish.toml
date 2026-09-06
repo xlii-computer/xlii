@@ -1,0 +1,23 @@
+name = "unpublish"
+description = "Take an app down: recursively delete its remote docroot (params: name, domain, conn, root)"
+
+[params.name]
+required = true
+help = "app label — the subdomain to take down"
+
+[params.domain]
+required = true
+help = "apps domain the box serves (e.g. example.com)"
+
+[params.conn]
+default = "appbox"
+help = "remote connection name (xlii remote add)"
+
+[params.root]
+default = "srv/apps"
+help = "docroot base on the box, relative to the SSH login home"
+
+# --yes here is safe: the task engine's own per-step confirm gate is the
+# interactive guard (never-auto-runs); without it the CLI would refuse.
+[[step]]
+run = "xlii remote unpublish sftp://{{conn}}/{{root}}/{{name}}.{{domain}} --yes"

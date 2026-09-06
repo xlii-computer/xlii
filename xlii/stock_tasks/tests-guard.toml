@@ -1,0 +1,15 @@
+name = "tests-guard"
+description = "Run the suite; on failure skip the green note and triage instead (shell-rc on_failure)"
+
+[[step]]
+id = "tests"
+run = "python -m pytest -q 2>&1 | tail -40"
+on_failure = "triage"
+
+[[step]]
+id = "head"
+run = "git log -1 --pretty=format:'validated HEAD %h %s'"
+
+[[step]]
+id = "triage"
+ask = """Summarize the pytest result above. If it FAILED: name the failing test(s), the likely root cause, and the first thing to check (3 bullets). If it PASSED: a one-line all-clear that names the validated HEAD."""

@@ -1,0 +1,11 @@
+name = "hackernews-top"
+version = 1
+summary = "HackerNews top story ids (no auth, no params) — the simplest provider shape"
+category = "news"
+
+[request]
+method = "GET"
+url = "https://hacker-news.firebaseio.com/v0/topstories.json"
+
+[shape]
+records = ""

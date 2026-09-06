@@ -1,0 +1,20 @@
+name = "new-folder"
+class = "system"
+description = "Create a folder here, init it as an xlii project, switch into it (params: name, kind)"
+
+[params.name]
+required = true
+help = "folder name (no path separators)"
+
+[params.kind]
+default = "code"
+enum = ["code", "collection"]
+help = "code = lab / repo; collection = talk pile"
+
+[[step]]
+id = "make"
+run = "xlii new {{name}} --local --kind {{kind}}"
+
+[[step]]
+id = "enter"
+slash = "/project switch {{name}}"

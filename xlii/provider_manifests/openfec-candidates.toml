@@ -1,0 +1,40 @@
+name = "openfec-candidates"
+version = 1
+summary = "Campaign contributions, PAC receipts, candidate financials, donor lookup (argus: openfec.candidates)"
+category = "compliance"
+required_params = [ "query"]
+
+[defaults]
+limit = "25"
+
+[request]
+method = "GET"
+url = "https://api.open.fec.gov/v1/candidates/search/"
+
+[request.params]
+q = "{query}"
+per_page = "{limit}"
+sort = "-election_years"
+
+[auth]
+kind = "query"
+key_env = "OPENFEC_API_KEY"
+param = "api_key"
+required = true
+
+[quota]
+daily = 1000
+
+[shape]
+records = "results"
+
+[shape.fields]
+name = "name"
+candidateId = "candidate_id"
+office = "office_full"
+party = "party_full"
+state = "state"
+district = "district"
+incumbentChallenger = "incumbent_challenge_full"
+status = "candidate_status"
+sourceUrl = "candidate_id"

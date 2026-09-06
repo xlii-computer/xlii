@@ -1,0 +1,36 @@
+name = "federal-register"
+version = 1
+summary = "Federal Register — final rules, proposed rules, notices, presidential documents (argus: federal-register.query)"
+category = "compliance"
+required_params = ["query"]
+
+[defaults]
+limit = "25"
+
+[request]
+method = "GET"
+url = "https://www.federalregister.gov/api/v1/documents.json"
+
+[request.params]
+"conditions[term]" = "{query}"
+per_page = "{limit}"
+
+[quota]
+daily = 1000
+
+[shape]
+records = "results"
+
+[shape.fields]
+title = "title"
+documentNumber = "document_number"
+type = "type"
+subtype = "subtype"
+publicationDate = "publication_date"
+citation = "citation"
+startPage = "start_page"
+endPage = "end_page"
+pdfUrl = "pdf_url"
+htmlUrl = "html_url"
+significantDocument = "significant"
+sourceUrl = "html_url"

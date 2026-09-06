@@ -1,0 +1,18 @@
+name = "pre-pr"
+description = "Pre-PR checklist: status, diff stat, recent commits, risk scan (read-only)"
+
+[[step]]
+run = "git status -sb"
+
+[[step]]
+run = "git diff --stat"
+
+[[step]]
+run = "git log -10 --oneline"
+
+[[step]]
+ask = """You are reviewing before opening a PR. From the status, diff stat, and recent commits above:
+- Summarize what this PR would contain
+- Flag likely missing tests or docs
+- Call out risky areas
+Keep it to 4-6 bullets."""

@@ -1,0 +1,12 @@
+name = "fourchan"
+version = 1
+summary = "Anonymous imageboard — search threads across boards (argus: fourchan.query)"
+category = "social"
+required_params = ["board"]
+
+[request]
+method = "GET"
+url = "https://a.4cdn.org/{board}/catalog.json"
+
+[shape]
+records = ""

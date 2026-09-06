@@ -1,0 +1,13 @@
+name = "bump-note"
+description = "Draft a release note for a patch/minor/major bump (enum param: level)"
+
+[params.level]
+enum = ["patch", "minor", "major"]
+default = "patch"
+help = "semver bump level"
+
+[[step]]
+run = "git log -20 --pretty=format:'%h %s'"
+
+[[step]]
+ask = """Draft a {{level}}-release note from the commits above: a one-line headline appropriate to a {{level}} bump, then 2-4 bullets of user-facing changes. Drop noise (merges, chore/typo commits)."""

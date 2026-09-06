@@ -1,0 +1,32 @@
+{
+  "_doc": "Frozen Stage-0 ratchet baselines for scripts/check_contracts.py (godzilla-mothra V0a). Exact file lists, repo-root-relative, sorted. The ratchet: no NEW entries ever; Stage 1 burns these down. A file listed here still violates today and is tolerated; a file NOT listed that violates fails CI; a listed file that stops violating must be deleted from the list (stale entries fail too).",
+  "path_home": [
+    "xlii/cmds/journal.py",
+    "xlii/cmds/project/_guards.py",
+    "xlii/cmds/project/scratch.py",
+    "xlii/config.py",
+    "xlii/context.py",
+    "xlii/daemon_gate.py",
+    "xlii/farm.py",
+    "xlii/farm_xmpp.py",
+    "xlii/help_corpus.py",
+    "xlii/journal_daemon.py",
+    "xlii/loadout_paths.py",
+    "xlii/persona.py",
+    "xlii/repl.py",
+    "xlii/skills.py",
+    "xlii/swarm.py",
+    "xlii/tui/app_menu_mixin.py",
+    "xlii/tui/blocks.py"
+  ],
+  "isatty": [
+    "xlii/cmds/email.py",
+    "xlii/cmds/mcp.py",
+    "xlii/cmds/project/_guards.py",
+    "xlii/cmds/provision/setup.py",
+    "xlii/cmds/sessions/code.py",
+    "xlii/imagine_run.py",
+    "xlii/repl.py"
+  ],
+  "keyring": []
+}

@@ -1,0 +1,19 @@
+name = "yahoo-finance-getChart"
+version = 1
+summary = "Stock quotes, OHLCV charts, ticker search — unofficial, no API key needed (argus: yahoo-finance.getChart)"
+category = "finance"
+required_params = ["intv", "query", "r"]
+
+[request]
+method = "GET"
+url = "https://query1.finance.yahoo.com/v8/finance/chart/{query}"
+
+[request.params]
+interval = "{intv}"
+range = "{r}"
+
+[quota]
+daily = 2000
+
+[shape]
+records = ""

@@ -1,0 +1,26 @@
+name = "alpha-vantage-getQuote"
+version = 1
+summary = "Stock quotes, OHLCV charts, ticker search, forex, crypto — 25 calls/day free (argus: alpha-vantage.getQuote)"
+category = "finance"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://www.alphavantage.co/query"
+
+[request.params]
+function = "GLOBAL_QUOTE"
+symbol = "{query}"
+
+[auth]
+kind = "query"
+key_env = "ALPHA_VANTAGE_API_KEY"
+param = "apikey"
+required = true
+
+[quota]
+daily = 25
+bucket = "alpha-vantage"
+
+[shape]
+records = ""

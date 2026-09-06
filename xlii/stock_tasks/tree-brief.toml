@@ -1,0 +1,11 @@
+name = "tree-brief"
+description = "Where am I? git status plus the latest commit line"
+
+[[step]]
+run = "git status -sb"
+
+[[step]]
+run = "git log -1 --oneline"
+
+[[step]]
+ask = "In two short bullets: working-tree state and the latest commit."

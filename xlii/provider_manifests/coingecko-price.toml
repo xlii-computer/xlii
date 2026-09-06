@@ -1,0 +1,25 @@
+name = "coingecko-price"
+version = 1
+summary = "Current coin prices from CoinGecko — keyed via the demo API header (works keyless at lower rate)"
+category = "finance"
+required_params = ["ids"]
+
+[request]
+method = "GET"
+url = "https://api.coingecko.com/api/v3/simple/price"
+
+[request.params]
+ids = "{ids}"
+vs_currencies = "{vs}"
+
+[auth]
+kind = "header"
+key_env = "COINGECKO_API_KEY"
+header = "x-cg-demo-api-key"
+required = false
+
+[defaults]
+vs = "usd"
+
+[shape]
+records = ""

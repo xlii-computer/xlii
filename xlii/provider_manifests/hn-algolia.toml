@@ -1,0 +1,28 @@
+name = "hn-algolia"
+version = 1
+summary = "HackerNews full-text search (Algolia) — paginated, field-projected records"
+category = "news"
+required_params = ["query"]
+
+[request]
+method = "GET"
+url = "https://hn.algolia.com/api/v1/search"
+
+[request.params]
+query = "{query}"
+hitsPerPage = "25"
+
+[pagination]
+kind = "page"
+param = "page"
+start = 0
+max_pages = 3
+
+[shape]
+records = "hits"
+
+[shape.fields]
+title = "title"
+url = "url"
+author = "author"
+points = "points"
