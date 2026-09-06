@@ -234,6 +234,8 @@ Alpha (as of 2026). End-to-end functional against real xAI accounts. Architectur
 
 `xlii --version`, `xlii help`, `xlii doctor`, and in-session `/help` are your friends.
 
+BTC donations (optional): [`bc1qvkc756tdgqsnwsxn8cmrkhk7hz5l622mnhmchr`](https://mempool.space/address/bc1qvkc756tdgqsnwsxn8cmrkhk7hz5l622mnhmchr)
+
 ## License
 
 See LICENSE.
